@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # safetynet
 
 A new Flutter project.
@@ -14,3 +15,7 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+=======
+# safetyNet
+Fourth year mobile development project for crime reporting and finding missing persons
+>>>>>>> dca3b381ad8dca3dc0d4f3e6c50e07f6fc8d3b62
