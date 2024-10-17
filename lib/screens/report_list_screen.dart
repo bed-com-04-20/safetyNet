@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/report_model.dart';
 import '../services/firestore_service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 
 class ReportListScreen extends StatefulWidget {
   @override
@@ -20,7 +22,7 @@ class _ReportListScreenState extends State<ReportListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlueAccent,
+      backgroundColor: Color(0xFF0D7BD9FF),
       appBar: AppBar(
         title: Text('Missing Person Reports'),
       ),
@@ -41,12 +43,103 @@ class _ReportListScreenState extends State<ReportListScreen> {
             itemCount: reports.length,
             itemBuilder: (context, index) {
               final report = reports[index];
-              return ListTile(
-                title: Text(report.missingPersonName),
-                subtitle: Text('Last Seen: ${report.lastSeen}'),
-                onTap: () {
-                  // You can navigate to a detailed report view here if needed
-                },
+              print('Image URL: ${report.imageUrl}');
+
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
+                  elevation: 5,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Picture section
+                        if (report.imageUrl != null && report.imageUrl!.isNotEmpty)
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: CachedNetworkImage(
+                              imageUrl: report.imageUrl!,
+                              height: 100,
+                              width: 100,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => Icon(Icons.error, color: Colors.red, size: 100),
+                            ),
+                          )
+                        else
+                        // Placeholder if no image
+                          Container(
+                            height: 100,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(
+                              Icons.person,
+                              size: 50,
+                              color: Colors.white,
+                            ),
+                          ),
+
+                        SizedBox(width: 16.0),
+
+                        // Information section
+                        Expanded(
+                          child: Column(
+
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+
+                              // Name
+                              Text(
+                                report.missingPersonName,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18.0,
+                                ),
+                              ),
+                              SizedBox(height: 8.0),
+
+                              // Last Seen
+                              Text(
+                                'Last Seen: ${report.lastSeen}',
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                              SizedBox(height: 8.0),
+
+                              // Location
+                              Text(
+                                'Location: ${report.location}',
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                              SizedBox(height: 8.0),
+
+                              // Details
+                              Text(
+                                'Details: ${report.details}',
+                                style: TextStyle(
+                                  fontSize: 14.0,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               );
             },
           );

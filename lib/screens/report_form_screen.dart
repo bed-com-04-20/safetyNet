@@ -197,17 +197,33 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
               ),
               SizedBox(height: 16.0),
 
-              // Input for details
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Details',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                    hintText: 'Provide any additional information that will help to find the person'),
-              //  maxLines: 4,
-                validator: Validators.requiredField,
-                onSaved: (value) {
-                  details = value!;
-                },
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Details',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                    ),
+                  ),
+                  SizedBox(height: 8.0), // Space between label and TextField
+                  TextFormField(
+                    decoration: InputDecoration(
+                      hintText: 'Provide any additional information that will help to find the person',
+                      border: OutlineInputBorder(), // Rectangular border
+                      contentPadding: EdgeInsets.all(16.0), // Padding inside the TextField
+                    ),
+                    maxLines: 4, // Allows the user to write multiple lines
+                    validator: Validators.requiredField,
+                    onSaved: (value) {
+                      details = value!;
+                    },
+                  ),
+                ],
               ),
+
+
               SizedBox(height: 45.0),
 
               // Image Picker button
