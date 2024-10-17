@@ -6,6 +6,7 @@ class ReportModel {
   final String lastSeen;
   final String location;
   final String details;
+  final String? imageUrl;
   final DateTime timestamp;
 
 
@@ -17,6 +18,7 @@ class ReportModel {
     required this.lastSeen,
     required this.location,
     required this.details,
+    this.imageUrl,
     required this.timestamp,
   });
 
@@ -29,6 +31,7 @@ class ReportModel {
       'lastSeen': lastSeen,
       'location': location,
       'details': details,
+      'imageUrl': imageUrl,
       'timestamp': timestamp.toIso8601String(),
     };
   }
