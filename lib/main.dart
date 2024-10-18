@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 import 'screens/report_form_screen.dart';
 import 'screens/report_list_screen.dart';
+import 'screens/crime_report_form_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,11 +15,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Missing Person Report',
+      title: 'SafetyNet App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: HomeScreen(), // Set HomeScreen as the home widget
+      routes: {
+        '/reportForm': (context) => ReportFormScreen(),    // Route for Missing Person report form
+        '/reportList': (context) => ReportListScreen(),    // Route for viewing report list
+        '/crimeReport': (context) => CrimeReportFormScreen(), // Route for Crime report form
+      },
     );
   }
 }
@@ -33,18 +38,12 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   List<Widget> _screens = [
-    ReportFormScreen(),  // Report Missing Person Screen
-    ReportListScreen(),   // Report List Screen
+    ReportFormScreen(),      // Report Missing Person Screen
+    ReportListScreen(),      // Report List Screen
+    CrimeReportFormScreen(), // Report Crime Screen
   ];
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    Navigator.pop(context); // Close the drawer after an item is tapped
-  }
-
-  void _navigateToScreen(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -77,12 +76,17 @@ class _HomeScreenState extends State<HomeScreen> {
             ListTile(
               leading: Icon(Icons.report),
               title: Text('Report Missing Person'),
-              onTap: () => _navigateToScreen(0),
+              onTap: () => _onItemTapped(0),
             ),
             ListTile(
               leading: Icon(Icons.list),
               title: Text('Report List'),
-              onTap: () => _navigateToScreen(1),
+              onTap: () => _onItemTapped(1),
+            ),
+            ListTile(
+              leading: Icon(Icons.security),
+              title: Text('Report Crime'),
+              onTap: () => _onItemTapped(2),
             ),
           ],
         ),

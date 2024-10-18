@@ -259,7 +259,17 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
               // Submit button
               ElevatedButton(
                 onPressed: submitReport,
-                child: Text('Submit Report'),
+                child: Text('Submit Report', style: TextStyle(),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:  Color(0xFFCD5C08), // Background color
+                  foregroundColor: Colors.white, // Ripple effect color when pressed
+                  elevation: 5, // Elevation (shadow)
+                  padding: EdgeInsets.symmetric(horizontal: 25, vertical: 12), // Padding inside button
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30), // Rounded corners
+                  ),
+                ),
               ),
             ],
           ),
