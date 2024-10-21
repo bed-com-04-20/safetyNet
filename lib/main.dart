@@ -1,9 +1,18 @@
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:safetynet/src/ui/registration.dart';
+
+import 'LandingPage.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Ensure binding is initialized
-  await Firebase.initializeApp(); // Initialize Firebase
+  WidgetsFlutterBinding.ensureInitialized();
+  // Initialize Firebase
+  await Firebase.initializeApp();
+
+  await FirebaseAppCheck.instance.activate(
+    androidProvider: AndroidProvider.debug,
+  );
   runApp(MyApp());
 }
 
@@ -14,6 +23,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter App',
       home: SwipePages(),
+
     );
   }
 }
@@ -24,6 +34,8 @@ class SwipePages extends StatelessWidget {
     return Scaffold(
       body: PageView(
         children: [
+          WelcomePage(),
+          RegistrationPage()
         ],
       ),
     );

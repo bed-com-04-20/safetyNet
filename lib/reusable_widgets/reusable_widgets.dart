@@ -11,10 +11,12 @@ Image logoWidget(String imageName) {
     height: 240,
     color: Colors.white,
     errorBuilder: (context, error, stackTrace) {
-      return Icon(Icons.error, size: 240, color: Colors.red); // Placeholder icon
+      return Icon(Icons.error, size: 240, color: Colors.red);
     },
   );
 }
+
+
 
 TextField reusableTextField(String text, IconData icon, bool isPasswordType,
     TextEditingController controller) {
@@ -70,14 +72,14 @@ Container signInSignUpButton(
             ),
           ),
           style: ButtonStyle(
-            minimumSize: MaterialStateProperty.all(Size(350, 50)), // Set width and height
-            backgroundColor: MaterialStateProperty.resolveWith((states) {
-              if (states.contains(MaterialState.pressed)) {
+            minimumSize: WidgetStateProperty.all(Size(350, 50)), // Set width and height
+            backgroundColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.pressed)) {
                 return Colors.black26;
               }
               return Colors.white;
             }),
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
           ),
         ),
