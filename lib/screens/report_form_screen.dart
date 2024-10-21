@@ -6,6 +6,7 @@ import '../models/report_model.dart';
 import '../services/firestore_service.dart';
 import '../utils/validators.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 
 class ReportFormScreen extends StatefulWidget {
   const ReportFormScreen({super.key});
@@ -32,6 +33,9 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
   final DateFormat _dateFormatter = DateFormat('yyyy-MM-dd');
 
+  // Loading state
+  bool _isLoading = false; // To track loading state
+
   // Pick an image from the gallery
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -54,10 +58,43 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     }
   }
 
+  // Check for duplicate report details
+  Future<bool> _checkForDuplicateReport() async {
+    final reportsCollection = FirebaseFirestore.instance.collection('missing_person_reports');
+    final querySnapshot = await reportsCollection
+        .where('details', isEqualTo: details) // Check if details match
+        .get();
+
+    return querySnapshot.docs.isNotEmpty; // Return true if duplicates exist
+  }
+
   // Submit the form to Firestore
   Future<void> submitReport() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
+      // Check for duplicate report
+      final isDuplicate = await _checkForDuplicateReport();
+      if (isDuplicate) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("Duplicate Report"),
+            content: Text("A report with the same details has already been submitted."),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text("OK"),
+              ),
+            ],
+          ),
+        );
+        return; // Exit if duplicate is found
+      }
+
+      setState(() {
+        _isLoading = true; // Set loading state to true
+      });
 
       // If an image is selected, upload it
       if (_selectedImage != null) {
@@ -87,6 +124,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 onPressed: () {
                   Navigator.of(context).pop();
                   _formKey.currentState!.reset(); // Reset the form
+                  _selectedImage = null; // Reset selected image
                 },
                 child: Text("OK"),
               ),
@@ -95,6 +133,10 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
         );
       } catch (error) {
         print("Error submitting report: $error");
+      } finally {
+        setState(() {
+          _isLoading = false; // Set loading state to false
+        });
       }
     }
   }
@@ -102,11 +144,26 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF615EFC),
+    backgroundColor: Color(0xFF615EFC),
       appBar: AppBar(
         title: Text('Report Missing Person'),
       ),
-      body: Padding(
+
+    body: Container(
+    // Apply gradient background
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        colors: [
+          Colors.white24,
+  //        Colors.black26,
+          Colors.white54,
+          Colors.black26,
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        ),
+    ),
+      child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
@@ -114,9 +171,11 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
             children: [
               // Input for missing person name
               TextFormField(
-                decoration: InputDecoration(labelText: 'Name',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                    hintText: 'enter a name of a missing person'),
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                  hintText: 'Enter a name of a missing person',
+                ),
                 validator: Validators.requiredField,
                 onSaved: (value) {
                   missingPersonName = value!;
@@ -126,9 +185,11 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
               // Input for missing person age
               TextFormField(
-                decoration: InputDecoration(labelText: 'Age',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                    hintText: 'Enter estamated age'),
+                decoration: InputDecoration(
+                  labelText: 'Age',
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                  hintText: 'Enter estimated age',
+                ),
                 validator: Validators.requiredField,
                 onSaved: (value) {
                   age = value!;
@@ -138,9 +199,11 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
               // Input for missing person gender
               TextFormField(
-                decoration: InputDecoration(labelText: 'Gender',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                    hintText: 'Enter gender'),
+                decoration: InputDecoration(
+                  labelText: 'Gender',
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                  hintText: 'Enter gender',
+                ),
                 validator: Validators.requiredField,
                 onSaved: (value) {
                   gender = value!;
@@ -150,7 +213,8 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
               // Date Picker for Last Seen
               TextFormField(
-                decoration: InputDecoration(labelText: 'Last Seen',
+                decoration: InputDecoration(
+                  labelText: 'Last Seen',
                   labelStyle: TextStyle(fontWeight: FontWeight.bold),
                   hintText: _selectedDate == null
                       ? 'Choose Date'
@@ -187,16 +251,17 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
               // Input for location
               TextFormField(
-                decoration: InputDecoration(labelText: 'Location',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                    hintText: 'Provide where s/he was lastly seen'),
+                decoration: InputDecoration(
+                  labelText: 'Location',
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                  hintText: 'Provide where s/he was lastly seen',
+                ),
                 validator: Validators.requiredField,
                 onSaved: (value) {
                   location = value!;
                 },
               ),
               SizedBox(height: 16.0),
-
 
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,7 +288,6 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 ],
               ),
 
-
               SizedBox(height: 45.0),
 
               // Image Picker button
@@ -231,10 +295,10 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 onPressed: _pickImage,
                 icon: Icon(Icons.photo), // Customize icon color
                 label: Text(
-                  "Upload image", style: TextStyle(), // Customize text color
+                  "Upload image", // Customize text color
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:  Color(0xFFCD5C08), // Background color
+                  backgroundColor: Color(0xFFCD5C08), // Background color
                   foregroundColor: Colors.white, // Ripple effect color when pressed
                   elevation: 5, // Elevation (shadow)
                   padding: EdgeInsets.symmetric(horizontal: 25, vertical: 12), // Padding inside button
@@ -244,7 +308,6 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 ),
               ),
 
-
               // Display selected image (if any)
               if (_selectedImage != null)
                 Padding(
@@ -252,20 +315,25 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                   child: Image.file(
                     _selectedImage!,
                     height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
                   ),
                 ),
-              SizedBox(height: 16.0),
+
+              SizedBox(height: 30.0),
 
               // Submit button
               ElevatedButton(
-                onPressed: submitReport,
-                child: Text('Submit Report', style: TextStyle(),
-                ),
+                onPressed: _isLoading ? null : submitReport, // Disable button if loading
+                child: _isLoading
+                    ? CircularProgressIndicator(
+                  color: Colors.white, // Spinner color
+                )
+                    : Text("Submit Report"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:  Color(0xFFCD5C08), // Background color
-                  foregroundColor: Colors.white, // Ripple effect color when pressed
-                  elevation: 5, // Elevation (shadow)
-                  padding: EdgeInsets.symmetric(horizontal: 25, vertical: 12), // Padding inside button
+                  backgroundColor: Color(0xFFCD5C08), // Background color
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 12.0), // Padding inside button
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30), // Rounded corners
                   ),
@@ -275,6 +343,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 }
