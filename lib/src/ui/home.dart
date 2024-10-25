@@ -1,44 +1,37 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:safetynet/reusable_widgets/reusable_widgets.dart';
+import 'package:safetynet/src/ui/replies.dart';
 import 'package:safetynet/utils/colors_utils.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-
-  void _crimes() async{}
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(
+    return Container(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height,
+      decoration: BoxDecoration(
+        color: hexStringToColor("615EFC"),
+      ),
 
-          color: hexStringToColor("615EFC"),
-        ),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).size.height * 0.2, 20, 0),
+        child: Column(
+          children: <Widget>[
+            logoWidget("assets/images/logo.png"),
+            SizedBox(height: 30),
 
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).size.height * 0.2, 20, 0),
-          child: Column(
-            children: <Widget>[
-              logoWidget("assets/images/logo.png"),
-              SizedBox(height: 30),
+            signInSignUpButton(context, false, () {
+            }),
+            signInSignUpButton(context, false, () {
+            }),
 
-              signInSignUpButton(context,
-                  false,
-                  _crimes)
-
-
-
-            ],
-          ),
+            signInSignUpButton(context, true, () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ConversationScreen()));
+            }),
+          ],
         ),
       ),
     );

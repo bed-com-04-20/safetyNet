@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart'; // Import the Firebase Database package
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:safetynet/reusable_widgets/reusable_widgets.dart';
-import 'package:safetynet/utils/colors_utils.dart'; // Import Firebase Authentication
+import 'package:safetynet/utils/colors_utils.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -32,7 +32,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       String password = _passwordController.text.trim();
 
       try {
-        // Register user using Firebase Authentication
         UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
           email: email,
           password: password,
@@ -41,7 +40,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         User? user = userCredential.user;
 
         if (user != null) {
-          // Save user data to the Realtime Database
           await _database.child('users').child(user.uid).set({
             'username': username,
             'email': email,
@@ -49,7 +47,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
           print('User registered: $username');
 
-          // Navigate to the login screen or homepage
           Navigator.pushNamed(context, 'login_screen');
         }
       } catch (e) {
@@ -72,8 +69,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).size.height * 0.2, 20, 0),
-          child: Form( // Add the Form widget here
-            key: _formKey, // Link the _formKey to the Form
+          child: Form(
+            key: _formKey,
             child: Column(
               children: <Widget>[
                 logoWidget("assets/images/logo.png"),
@@ -106,7 +103,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 signInSignUpButton(
                   context,
                   false,
-                  _register, // Calls the _register function when pressed
+                  _register,
                 ),
                 SizedBox(height: 20),
               ],
