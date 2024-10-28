@@ -144,206 +144,201 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    backgroundColor: Color(0xFF615EFC),
-      appBar: AppBar(
-        title: Text('Report Missing Person'),
+      body: Container(
+      // Apply gradient background
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.white24,
+    //        Colors.black26,
+            Colors.white54,
+            Colors.black26,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          ),
       ),
-
-    body: Container(
-    // Apply gradient background
-    decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [
-          Colors.white24,
-  //        Colors.black26,
-          Colors.white54,
-          Colors.black26,
-        ],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        ),
-    ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              // Input for missing person name
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Name',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                  hintText: 'Enter a name of a missing person',
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                // Input for missing person name
+                TextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Name',
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                    hintText: 'Enter a name of a missing person',
+                  ),
+                  validator: Validators.requiredField,
+                  onSaved: (value) {
+                    missingPersonName = value!;
+                  },
                 ),
-                validator: Validators.requiredField,
-                onSaved: (value) {
-                  missingPersonName = value!;
-                },
-              ),
-              SizedBox(height: 16.0),
+                SizedBox(height: 16.0),
 
-              // Input for missing person age
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Age',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                  hintText: 'Enter estimated age',
+                // Input for missing person age
+                TextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Age',
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                    hintText: 'Enter estimated age',
+                  ),
+                  validator: Validators.requiredField,
+                  onSaved: (value) {
+                    age = value!;
+                  },
                 ),
-                validator: Validators.requiredField,
-                onSaved: (value) {
-                  age = value!;
-                },
-              ),
-              SizedBox(height: 16.0),
+                SizedBox(height: 16.0),
 
-              // Input for missing person gender
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Gender',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                  hintText: 'Enter gender',
+                // Input for missing person gender
+                TextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Gender',
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                    hintText: 'Enter gender',
+                  ),
+                  validator: Validators.requiredField,
+                  onSaved: (value) {
+                    gender = value!;
+                  },
                 ),
-                validator: Validators.requiredField,
-                onSaved: (value) {
-                  gender = value!;
-                },
-              ),
-              SizedBox(height: 16.0),
+                SizedBox(height: 16.0),
 
-              // Date Picker for Last Seen
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Last Seen',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                  hintText: _selectedDate == null
-                      ? 'Choose Date'
-                      : _dateFormatter.format(_selectedDate!),
+                // Date Picker for Last Seen
+                TextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Last Seen',
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                    hintText: _selectedDate == null
+                        ? 'Choose Date'
+                        : _dateFormatter.format(_selectedDate!),
+                  ),
+                  validator: (value) {
+                    if (_selectedDate == null) {
+                      return 'Please choose a date';
+                    }
+                    return null;
+                  },
+                  onTap: () async {
+                    FocusScope.of(context).requestFocus(FocusNode());
+                    final DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime.now(),
+                    );
+                    if (pickedDate != null && pickedDate != _selectedDate) {
+                      setState(() {
+                        _selectedDate = pickedDate;
+                      });
+                    }
+                  },
+                  readOnly: true,
+                  onSaved: (value) {
+                    if (_selectedDate != null) {
+                      lastSeen = _dateFormatter.format(_selectedDate!);
+                    }
+                  },
                 ),
-                validator: (value) {
-                  if (_selectedDate == null) {
-                    return 'Please choose a date';
-                  }
-                  return null;
-                },
-                onTap: () async {
-                  FocusScope.of(context).requestFocus(FocusNode());
-                  final DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime.now(),
-                  );
-                  if (pickedDate != null && pickedDate != _selectedDate) {
-                    setState(() {
-                      _selectedDate = pickedDate;
-                    });
-                  }
-                },
-                readOnly: true,
-                onSaved: (value) {
-                  if (_selectedDate != null) {
-                    lastSeen = _dateFormatter.format(_selectedDate!);
-                  }
-                },
-              ),
-              SizedBox(height: 16.0),
+                SizedBox(height: 16.0),
 
-              // Input for location
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Location',
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                  hintText: 'Provide where s/he was lastly seen',
+                // Input for location
+                TextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Location',
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                    hintText: 'Provide where s/he was lastly seen',
+                  ),
+                  validator: Validators.requiredField,
+                  onSaved: (value) {
+                    location = value!;
+                  },
                 ),
-                validator: Validators.requiredField,
-                onSaved: (value) {
-                  location = value!;
-                },
-              ),
-              SizedBox(height: 16.0),
+                SizedBox(height: 16.0),
 
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Details',
-                    style: TextStyle(
-                      fontSize: 16.0,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Details',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                      ),
+                    ),
+                    SizedBox(height: 8.0), // Space between label and TextField
+                    TextFormField(
+                      decoration: InputDecoration(
+                        hintText: 'Provide any additional information that will help to find the person',
+                        border: OutlineInputBorder(), // Rectangular border
+                        contentPadding: EdgeInsets.all(16.0), // Padding inside the TextField
+                      ),
+                      maxLines: 4, // Allows the user to write multiple lines
+                      validator: Validators.requiredField,
+                      onSaved: (value) {
+                        details = value!;
+                      },
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 45.0),
+
+                // Image Picker button
+                ElevatedButton.icon(
+                  onPressed: _pickImage,
+                  icon: Icon(Icons.photo), // Customize icon color
+                  label: Text(
+                    "Upload image", // Customize text color
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFCD5C08), // Background color
+                    foregroundColor: Colors.white, // Ripple effect color when pressed
+                    elevation: 5, // Elevation (shadow)
+                    padding: EdgeInsets.symmetric(horizontal: 25, vertical: 12), // Padding inside button
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30), // Rounded corners
                     ),
                   ),
-                  SizedBox(height: 8.0), // Space between label and TextField
-                  TextFormField(
-                    decoration: InputDecoration(
-                      hintText: 'Provide any additional information that will help to find the person',
-                      border: OutlineInputBorder(), // Rectangular border
-                      contentPadding: EdgeInsets.all(16.0), // Padding inside the TextField
+                ),
+
+                // Display selected image (if any)
+                if (_selectedImage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: Image.file(
+                      _selectedImage!,
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
                     ),
-                    maxLines: 4, // Allows the user to write multiple lines
-                    validator: Validators.requiredField,
-                    onSaved: (value) {
-                      details = value!;
-                    },
                   ),
-                ],
-              ),
 
-              SizedBox(height: 45.0),
+                SizedBox(height: 30.0),
 
-              // Image Picker button
-              ElevatedButton.icon(
-                onPressed: _pickImage,
-                icon: Icon(Icons.photo), // Customize icon color
-                label: Text(
-                  "Upload image", // Customize text color
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFCD5C08), // Background color
-                  foregroundColor: Colors.white, // Ripple effect color when pressed
-                  elevation: 5, // Elevation (shadow)
-                  padding: EdgeInsets.symmetric(horizontal: 25, vertical: 12), // Padding inside button
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30), // Rounded corners
+                // Submit button
+                ElevatedButton(
+                  onPressed: _isLoading ? null : submitReport, // Disable button if loading
+                  child: _isLoading
+                      ? CircularProgressIndicator(
+                    color: Colors.white, // Spinner color
+                  )
+                      : Text("Submit Report"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFCD5C08), // Background color
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 12.0), // Padding inside button
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30), // Rounded corners
+                    ),
                   ),
                 ),
-              ),
-
-              // Display selected image (if any)
-              if (_selectedImage != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
-                  child: Image.file(
-                    _selectedImage!,
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-
-              SizedBox(height: 30.0),
-
-              // Submit button
-              ElevatedButton(
-                onPressed: _isLoading ? null : submitReport, // Disable button if loading
-                child: _isLoading
-                    ? CircularProgressIndicator(
-                  color: Colors.white, // Spinner color
-                )
-                    : Text("Submit Report"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFCD5C08), // Background color
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 12.0), // Padding inside button
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30), // Rounded corners
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 }

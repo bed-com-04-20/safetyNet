@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import '../../utils/colors_utils.dart';
+
 class ReportListScreen extends StatelessWidget {
   final CollectionReference reportsCollection =
   FirebaseFirestore.instance.collection('missing_person_reports');
@@ -15,17 +17,10 @@ class ReportListScreen extends StatelessWidget {
       ),
 
     body: Container(
-    decoration: BoxDecoration(
-     gradient: LinearGradient(
-          colors: [
-          Colors.red,
-          Colors.blue,
-          Colors.purple,
-        ],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        ),
-     ),
+      height: MediaQuery.of(context).size.height,
+      decoration: BoxDecoration(
+        color: hexStringToColor("615EFC"),
+      ),
       child: StreamBuilder<QuerySnapshot>(
         stream: reportsCollection.snapshots(),
         builder: (context, snapshot) {
@@ -68,7 +63,7 @@ class ReportListScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Card(
-                      color: Colors.transparent, // Make the card transparent to show the gradient
+                      color: Colors.transparent,
                       elevation: 5,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
