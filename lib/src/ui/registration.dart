@@ -16,7 +16,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   TextEditingController _passwordTextController = TextEditingController();
   TextEditingController _emailTextController = TextEditingController();
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;  // Add FirebaseAuth instance
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -38,23 +38,18 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 reusableTextField("Enter Password", Icons.lock_outline, true, _passwordTextController),
                 SizedBox(height: 30),
 
-                // Sign-in Button
                 signInSignUpButton(context, true, () async {
-                  // Authenticate user
                   try {
                     UserCredential userCredential = await _auth.signInWithEmailAndPassword(
                       email: _emailTextController.text,
                       password: _passwordTextController.text,
                     );
-
-                    // If successful, navigate to the home screen (AppRouter in this case)
                     if (userCredential.user == null) {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) => AppRouter()));
                     }
 
-                  } catch (e) {
-                    // Display an error if sign-in fails
+                    } catch (e) {
                     showDialog(
                       context: context,
                       builder: (context) {

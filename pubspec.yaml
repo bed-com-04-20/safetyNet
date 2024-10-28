@@ -33,7 +33,7 @@ dependencies:
 
   # Firebase core for Firebase initialization
   firebase_core: ^2.16.0
-  firebase_app_check: 0.2.2
+  firebase_app_check: ^0.2.2
 
   firebase_storage: 11.6.5
 
@@ -68,8 +68,7 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - assets/images/img1.png
-    - assets/images/logo.png
+    - assets/
 
 
   # The following line ensures that the Material Icons font is
