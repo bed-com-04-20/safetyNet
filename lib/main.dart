@@ -11,7 +11,7 @@ void main() async {
   await Firebase.initializeApp();
 
   await FirebaseAppCheck.instance.activate(
-    androidProvider: AndroidProvider.debug,
+    androidProvider: AndroidProvider.playIntegrity,
   );
   runApp(MyApp());
 }

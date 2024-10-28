@@ -33,7 +33,7 @@ dependencies:
 
   # Firebase core for Firebase initialization
   firebase_core: ^2.16.0
-  firebase_app_check: 0.2.2
+  firebase_app_check: ^0.2.2
 
   firebase_storage: 11.6.5
 
