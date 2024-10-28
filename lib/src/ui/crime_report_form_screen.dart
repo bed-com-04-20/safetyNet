@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io'; // For File type
 import 'package:firebase_storage/firebase_storage.dart';
-import '../models/crime_report_model.dart';
-import '../services/firestore_service.dart';
+import '../../models/crime_report_model.dart';
+import '../../services/firestore_service.dart';
 
 class CrimeReportFormScreen extends StatefulWidget {
   const CrimeReportFormScreen({super.key});

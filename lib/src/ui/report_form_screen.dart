@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io'; // For File type
 import 'package:firebase_storage/firebase_storage.dart'; // For file uploads
-import '../models/report_model.dart';
-import '../services/firestore_service.dart';
-import '../utils/validators.dart';
+import '../../models/report_model.dart';
+import '../../services/firestore_service.dart';
+import '../../utils/validators.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 

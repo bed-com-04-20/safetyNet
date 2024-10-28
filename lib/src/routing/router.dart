@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:safetynet/src/ui/report_list_screen.dart';
 import '../ui/home.dart';
-import '../ui/login.dart';
-import '../ui/search.dart';
 import '../ui/profile.dart';
+import '../ui/report_form_screen.dart';
 
 class AppRouter extends StatefulWidget {
   @override
@@ -14,9 +14,8 @@ class _AppRouterState extends State<AppRouter> {
 
   final List<Widget> _pages = [
     HomePage(),
-    SearchPage(),
-    LoginPage(),
-    ProfilePage(),
+    ReportFormScreen(),
+    ReportListScreen(),
   ];
 
   void onTabTapped(int index) {
@@ -28,7 +27,7 @@ class _AppRouterState extends State<AppRouter> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex], // Display the selected page
+      body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         onTap: onTabTapped,
         currentIndex: _currentIndex,
@@ -37,15 +36,13 @@ class _AppRouterState extends State<AppRouter> {
             icon: Icon(Icons.home),
             label: 'Home',
           ),
-
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Report missing person',
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
             label: 'Search',
-          ),
-
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
           ),
         ],
       ),

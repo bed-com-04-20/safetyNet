@@ -15,7 +15,6 @@ class ReportListScreen extends StatelessWidget {
       ),
 
     body: Container(
-    // Apply gradient background to the entire screen
     decoration: BoxDecoration(
      gradient: LinearGradient(
           colors: [
