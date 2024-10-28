@@ -4,6 +4,7 @@ import 'dart:io'; // For File type
 import 'package:firebase_storage/firebase_storage.dart'; // For file uploads
 import '../../models/report_model.dart';
 import '../../services/firestore_service.dart';
+import '../../utils/colors_utils.dart';
 import '../../utils/validators.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
@@ -145,51 +146,46 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-      // Apply gradient background
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.white24,
-    //        Colors.black26,
-            Colors.white54,
-            Colors.black26,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          ),
-      ),
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+          color: hexStringToColor("615EFC"),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
             child: ListView(
               children: [
-                // Input for missing person name
+
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Name',
                     labelStyle: TextStyle(fontWeight: FontWeight.bold),
                     hintText: 'Enter a name of a missing person',
                   ),
+
                   validator: Validators.requiredField,
                   onSaved: (value) {
                     missingPersonName = value!;
                   },
                 ),
+
                 SizedBox(height: 16.0),
 
-                // Input for missing person age
+
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Age',
                     labelStyle: TextStyle(fontWeight: FontWeight.bold),
                     hintText: 'Enter estimated age',
                   ),
+
                   validator: Validators.requiredField,
                   onSaved: (value) {
                     age = value!;
                   },
                 ),
+
                 SizedBox(height: 16.0),
 
                 // Input for missing person gender
@@ -199,11 +195,13 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                     labelStyle: TextStyle(fontWeight: FontWeight.bold),
                     hintText: 'Enter gender',
                   ),
+
                   validator: Validators.requiredField,
                   onSaved: (value) {
                     gender = value!;
                   },
                 ),
+
                 SizedBox(height: 16.0),
 
                 // Date Picker for Last Seen
@@ -215,6 +213,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                         ? 'Choose Date'
                         : _dateFormatter.format(_selectedDate!),
                   ),
+
                   validator: (value) {
                     if (_selectedDate == null) {
                       return 'Please choose a date';
@@ -242,6 +241,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                     }
                   },
                 ),
+
                 SizedBox(height: 16.0),
 
                 // Input for location
@@ -274,7 +274,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                         border: OutlineInputBorder(), // Rectangular border
                         contentPadding: EdgeInsets.all(16.0), // Padding inside the TextField
                       ),
-                      maxLines: 4, // Allows the user to write multiple lines
+                      maxLines: 4,
                       validator: Validators.requiredField,
                       onSaved: (value) {
                         details = value!;
