@@ -53,8 +53,9 @@ class ReportListScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                            Colors.white54,
-                         Colors.white,
+                          // Colors.white54,
+                          Colors.white,
+                          Colors.white
 
                         ],
                         begin: Alignment.topLeft,
