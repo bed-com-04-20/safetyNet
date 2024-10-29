@@ -20,6 +20,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final FirestoreService _firestoreService = FirestoreService();
   DateTime? _selectedDate;
+  final TextEditingController _dateController = TextEditingController(); // Controller for date field
   File? _selectedImage; // This will hold the selected image file
   String? _imageUrl; // This will store the image URL after upload
   final ImagePicker _picker = ImagePicker(); // To pick images
@@ -142,6 +143,13 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     }
   }
 
+  //to display the date after being picked-up
+  @override
+  void dispose() {
+    _dateController.dispose(); // Dispose controller when done
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -156,11 +164,11 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
             key: _formKey,
             child: ListView(
               children: [
-
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Name',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold,
+                    color: Colors.white),
                     hintText: 'Enter a name of a missing person',
                   ),
 
@@ -176,7 +184,8 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Age',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold,
+                        color: Colors.white),
                     hintText: 'Enter estimated age',
                   ),
 
@@ -192,7 +201,8 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Gender',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold,
+                    color: Colors.white),
                     hintText: 'Enter gender',
                   ),
 
@@ -206,14 +216,15 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
                 // Date Picker for Last Seen
                 TextFormField(
+                  controller: _dateController, // Attach controller here
                   decoration: InputDecoration(
                     labelText: 'Last Seen',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                    hintText: _selectedDate == null
-                        ? 'Choose Date'
-                        : _dateFormatter.format(_selectedDate!),
+                    labelStyle: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    hintText: 'Choose Date',
                   ),
-
                   validator: (value) {
                     if (_selectedDate == null) {
                       return 'Please choose a date';
@@ -228,9 +239,10 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                       firstDate: DateTime(2000),
                       lastDate: DateTime.now(),
                     );
-                    if (pickedDate != null && pickedDate != _selectedDate) {
+                    if (pickedDate != null) {
                       setState(() {
                         _selectedDate = pickedDate;
+                        _dateController.text = _dateFormatter.format(pickedDate); // Display the picked date
                       });
                     }
                   },
@@ -241,14 +253,14 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                     }
                   },
                 ),
-
                 SizedBox(height: 16.0),
 
                 // Input for location
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Location',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold,
+                        color: Colors.white),
                     hintText: 'Provide where s/he was lastly seen',
                   ),
                   validator: Validators.requiredField,
@@ -265,6 +277,8 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                       'Details',
                       style: TextStyle(
                         fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white
                       ),
                     ),
                     SizedBox(height: 8.0), // Space between label and TextField
@@ -272,6 +286,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                       decoration: InputDecoration(
                         hintText: 'Provide any additional information that will help to find the person',
                         border: OutlineInputBorder(), // Rectangular border
+                        labelStyle: TextStyle(color: Colors.white),
                         contentPadding: EdgeInsets.all(16.0), // Padding inside the TextField
                       ),
                       maxLines: 4,

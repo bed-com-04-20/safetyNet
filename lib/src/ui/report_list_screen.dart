@@ -11,7 +11,7 @@ class ReportListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF5F7597),
+      // backgroundColor: Color(0xFFE18888),
       appBar: AppBar(
         title: Text('Missing Person Reports'),
       ),
@@ -51,16 +51,15 @@ class ReportListScreen extends StatelessWidget {
                   child: Container(
                     // Gradient background for each card
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          // Colors.white54,
-                          Colors.white,
-                          Colors.white
-
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      color: Colors.white,
+                      // gradient: LinearGradient(
+                      //   colors: [
+                      //     Colors.white,
+                      //     Colors.white
+                      //   ],
+                      //   begin: Alignment.topLeft,
+                      //   end: Alignment.bottomRight,
+                      // ),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Card(
