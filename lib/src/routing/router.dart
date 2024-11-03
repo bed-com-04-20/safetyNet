@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../ui/home.dart';
-import '../ui/login.dart';
 import '../ui/search.dart';
 import '../ui/profile.dart';
 
@@ -15,7 +14,6 @@ class _AppRouterState extends State<AppRouter> {
   final List<Widget> _pages = [
     HomePage(),
     SearchPage(),
-    LoginPage(),
     ProfilePage(),
   ];
 

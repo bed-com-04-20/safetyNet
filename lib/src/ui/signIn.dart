@@ -31,7 +31,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).size.height * 0.2, 20, 0),
             child: Column(
               children: <Widget>[
-                logoWidget("assets/images/logo.png"),
+                logoWidget("assets/logo.png"),
                 SizedBox(height: 30),
                 reusableTextField("Enter username", Icons.person_outline, false, _emailTextController),
                 SizedBox(height: 30),
