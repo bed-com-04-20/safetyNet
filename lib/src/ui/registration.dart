@@ -3,6 +3,7 @@ import 'package:safetynet/reusable_widgets/reusable_widgets.dart';
 import 'package:safetynet/src/routing/router.dart';
 import 'package:safetynet/src/ui/signUp.dart';
 import 'package:safetynet/utils/colors_utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
@@ -12,8 +13,9 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
-  TextEditingController _emailTextController = TextEditingController();
-  TextEditingController _passwordTextController = TextEditingController();
+  final TextEditingController _emailTextController = TextEditingController();
+  final TextEditingController _passwordTextController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +37,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 reusableTextField("Enter Password", Icons.lock_outline, true, _passwordTextController),
                 SizedBox(height: 30),
 
-                signInSignUpButton(context, true, () {
-                  // Simulate a successful login without authentication
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => AppRouter()));
+                signInSignUpButton(context, true, () async {
+                  // Firebase authentication login
+                  try {
+                    final userCredential = await _auth.signInWithEmailAndPassword(
+                      email: _emailTextController.text.trim(),
+                      password: _passwordTextController.text.trim(),
+                    );
+
+                    if (userCredential.user != null) {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => AppRouter()));
+                    }
+                  } catch (e) {
+                    // Show error message if login fails
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Login failed: ${e.toString()}")),
+                    );
+                  }
                 }),
 
                 signUpOption(),
