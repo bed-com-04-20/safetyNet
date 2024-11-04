@@ -34,15 +34,44 @@ class WelcomePage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                'Welcome to safetyNet, where hope meets action',
-                style: TextStyle(
-                  fontSize: 50,
-                  fontStyle: FontStyle.normal,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+              RichText(
+                textAlign: TextAlign.justify,
+                text: TextSpan(
+                  style: TextStyle(
+                    fontSize: 50,
+                    fontStyle: FontStyle.normal,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    height: 2,
+                  ),
+                  children: [
+                    TextSpan(text: 'Welcome'),
+                    WidgetSpan(
+                      child: SizedBox(width: 20),
+                    ),
+                    TextSpan(text: 'to'),
+                    WidgetSpan(
+                      child: SizedBox(width: 4),
+                    ),
+                    TextSpan(text: 'SafetyNet,'),
+                    WidgetSpan(
+                      child: SizedBox(width: 4),
+                    ),
+                    TextSpan(text: 'where'),
+                    WidgetSpan(
+                      child: SizedBox(width: 4),
+                    ),
+                    TextSpan(text: 'Hope'),
+                    WidgetSpan(
+                      child: SizedBox(width: 20),
+                    ),
+                    TextSpan(text: 'meets'),
+                    WidgetSpan(
+                      child: SizedBox(width: 4),
+                    ),
+                    TextSpan(text: 'Action!'),
+                  ],
                 ),
-                textAlign: TextAlign.center,
               ),
             ],
           ),

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io'; // For File type
-import 'package:firebase_storage/firebase_storage.dart'; // For file uploads
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import '../../models/report_model.dart';
-import '../../services/firestore_service.dart';
 import '../../utils/colors_utils.dart';
 import '../../utils/validators.dart';
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
+import 'package:firebase_database/firebase_database.dart';
 
 class ReportFormScreen extends StatefulWidget {
   const ReportFormScreen({super.key});
@@ -18,7 +17,7 @@ class ReportFormScreen extends StatefulWidget {
 
 class _ReportFormScreenState extends State<ReportFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final FirestoreService _firestoreService = FirestoreService();
+  final DatabaseReference _database = FirebaseDatabase.instance.ref();
   DateTime? _selectedDate;
   File? _selectedImage; // This will hold the selected image file
   String? _imageUrl; // This will store the image URL after upload

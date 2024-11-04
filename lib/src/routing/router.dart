@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:safetynet/src/ui/report_form_screen.dart';
 import 'package:safetynet/src/ui/report_list_screen.dart';
 import '../ui/home.dart';
-import '../ui/profile.dart';
-import '../ui/report_form_screen.dart';
 
 class AppRouter extends StatefulWidget {
   @override
@@ -27,7 +26,7 @@ class _AppRouterState extends State<AppRouter> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex],
+      body: _pages[_currentIndex], // Display the selected page
       bottomNavigationBar: BottomNavigationBar(
         onTap: onTabTapped,
         currentIndex: _currentIndex,
@@ -36,13 +35,15 @@ class _AppRouterState extends State<AppRouter> {
             icon: Icon(Icons.home),
             label: 'Home',
           ),
+
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Report missing person',
+            label: 'Report Missing Person',
           ),
+
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
-            label: 'Search',
+            label: 'Search missing Person',
           ),
         ],
       ),

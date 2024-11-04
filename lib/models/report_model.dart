@@ -22,7 +22,6 @@ class ReportModel {
     required this.timestamp,
   });
 
-  // Convert ReportModel object to a Map for Firebase
   Map<String, dynamic> toMap() {
     return {
       'missingPersonName': missingPersonName,
@@ -36,7 +35,6 @@ class ReportModel {
     };
   }
 
-  // Create a ReportModel object from a Map
   factory ReportModel.fromMap(Map<String, dynamic> map) {
     return ReportModel(
       //id: map['id'], // This line assumes you stored the id in the map
