@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io'; // For File type
-import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart'; // For file uploads
 import '../../models/report_model.dart';
+import '../../services/firestore_service.dart';
 import '../../utils/colors_utils.dart';
 import '../../utils/validators.dart';
 import 'package:intl/intl.dart';
-import 'package:firebase_storage/firebase_storage.dart'; // Import Firebase Storage
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 
 class ReportFormScreen extends StatefulWidget {
   const ReportFormScreen({super.key});
@@ -17,12 +18,12 @@ class ReportFormScreen extends StatefulWidget {
 
 class _ReportFormScreenState extends State<ReportFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final DatabaseReference reportsRef = FirebaseDatabase.instance.ref().child('missing_person_reports');
+  final FirestoreService _firestoreService = FirestoreService();
   DateTime? _selectedDate;
-  final TextEditingController _dateController = TextEditingController();
-  File? _selectedImage;
-  String? _imageUrl;
-  final ImagePicker _picker = ImagePicker();
+  final TextEditingController _dateController = TextEditingController(); // Controller for date field
+  File? _selectedImage; // This will hold the selected image file
+  String? _imageUrl; // This will store the image URL after upload
+  final ImagePicker _picker = ImagePicker(); // To pick images
 
   // Form fields
   String missingPersonName = '';
@@ -35,7 +36,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   final DateFormat _dateFormatter = DateFormat('yyyy-MM-dd');
 
   // Loading state
-  bool _isLoading = false;
+  bool _isLoading = false; // To track loading state
 
   // Pick an image from the gallery
   Future<void> _pickImage() async {
@@ -50,9 +51,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   // Upload the image to Firebase Storage
   Future<String> _uploadImage(File image) async {
     try {
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child('missing_persons/${DateTime.now()}.jpg');
+      final storageRef = FirebaseStorage.instance.ref().child('missing_persons/${DateTime.now()}.jpg');
       final uploadTask = storageRef.putFile(image);
       final snapshot = await uploadTask;
       return await snapshot.ref.getDownloadURL();
@@ -63,27 +62,20 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
   // Check for duplicate report details
   Future<bool> _checkForDuplicateReport() async {
-    final snapshot = await reportsRef.once();
-    if (snapshot.snapshot.value != null) {
-      final reportsMap = snapshot.snapshot.value as Map<dynamic, dynamic>?;
-      if (reportsMap != null) {
-        for (var report in reportsMap.values) {
-          if (report is Map<dynamic, dynamic> && report.containsKey('details')) {
-            if (report['details'] == details) {
-              return true;
-            }
-          }
-        }
-      }
-    }
-    return false;
+    final reportsCollection = FirebaseFirestore.instance.collection('missing_person_reports');
+    final querySnapshot = await reportsCollection
+        .where('details', isEqualTo: details) // Check if details match
+        .get();
+
+    return querySnapshot.docs.isNotEmpty; // Return true if duplicates exist
   }
 
-  // Submit the form to Realtime Database
+  // Submit the form to Firestore
   Future<void> submitReport() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
+      // Check for duplicate report
       final isDuplicate = await _checkForDuplicateReport();
       if (isDuplicate) {
         showDialog(
@@ -99,63 +91,62 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
             ],
           ),
         );
-        return;
+        return; // Exit if duplicate is found
       }
 
       setState(() {
-        _isLoading = true;
+        _isLoading = true; // Set loading state to true
       });
 
+      // If an image is selected, upload it
       if (_selectedImage != null) {
         _imageUrl = await _uploadImage(_selectedImage!);
       }
 
-      // Create a new report using the ReportModel
       ReportModel newReport = ReportModel(
         missingPersonName: missingPersonName,
         age: age,
         gender: gender,
-        lastSeen: _selectedDate != null ? _dateFormatter.format(_selectedDate!) : '',
+        lastSeen: lastSeen,
         location: location,
         details: details,
-        imageUrl: _imageUrl,
-        timestamp: DateTime.now().millisecondsSinceEpoch,
+        imageUrl: _imageUrl, // Save the image URL
+        timestamp: DateTime.now(),
       );
 
       try {
-        // Push the new report to Firebase Realtime Database
-        await reportsRef.push().set(newReport.toJson()).then((_) {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text("Report Submitted"),
-              content: Text("The missing person report has been successfully submitted."),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    _formKey.currentState!.reset();
-                    _selectedImage = null;
-                  },
-                  child: Text("OK"),
-                ),
-              ],
-            ),
-          );
-        });
+        await _firestoreService.addReport(newReport);
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("Report Submitted"),
+            content: Text("The missing person report has been successfully submitted."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _formKey.currentState!.reset(); // Reset the form
+                  _selectedImage = null; // Reset selected image
+                },
+                child: Text("OK"),
+              ),
+            ],
+          ),
+        );
       } catch (error) {
         print("Error submitting report: $error");
       } finally {
         setState(() {
-          _isLoading = false;
+          _isLoading = false; // Set loading state to false
         });
       }
     }
   }
 
+  //to display the date after being picked-up
   @override
   void dispose() {
-    _dateController.dispose();
+    _dateController.dispose(); // Dispose controller when done
     super.dispose();
   }
 
@@ -176,44 +167,62 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Name',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold,
+                    color: Colors.white),
                     hintText: 'Enter a name of a missing person',
                   ),
+
                   validator: Validators.requiredField,
                   onSaved: (value) {
                     missingPersonName = value!;
                   },
                 ),
+
                 SizedBox(height: 16.0),
+
+
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Age',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold,
+                        color: Colors.white),
                     hintText: 'Enter estimated age',
                   ),
+
                   validator: Validators.requiredField,
                   onSaved: (value) {
                     age = value!;
                   },
                 ),
+
                 SizedBox(height: 16.0),
+
+                // Input for missing person gender
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Gender',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold,
+                    color: Colors.white),
                     hintText: 'Enter gender',
                   ),
+
                   validator: Validators.requiredField,
                   onSaved: (value) {
                     gender = value!;
                   },
                 ),
+
                 SizedBox(height: 16.0),
+
+                // Date Picker for Last Seen
                 TextFormField(
-                  controller: _dateController,
+                  controller: _dateController, // Attach controller here
                   decoration: InputDecoration(
                     labelText: 'Last Seen',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    labelStyle: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                     hintText: 'Choose Date',
                   ),
                   validator: (value) {
@@ -233,7 +242,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                     if (pickedDate != null) {
                       setState(() {
                         _selectedDate = pickedDate;
-                        _dateController.text = _dateFormatter.format(pickedDate);
+                        _dateController.text = _dateFormatter.format(pickedDate); // Display the picked date
                       });
                     }
                   },
@@ -245,10 +254,13 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                   },
                 ),
                 SizedBox(height: 16.0),
+
+                // Input for location
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Location',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold,
+                        color: Colors.white),
                     hintText: 'Provide where s/he was lastly seen',
                   ),
                   validator: Validators.requiredField,
@@ -257,31 +269,85 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                   },
                 ),
                 SizedBox(height: 16.0),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Details',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                    hintText: 'Enter additional details',
-                  ),
-                  validator: Validators.requiredField,
-                  onSaved: (value) {
-                    details = value!;
-                  },
+
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Details',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white
+                      ),
+                    ),
+                    SizedBox(height: 8.0), // Space between label and TextField
+                    TextFormField(
+                      decoration: InputDecoration(
+                        hintText: 'Provide any additional information that will help to find the person',
+                        border: OutlineInputBorder(), // Rectangular border
+                        labelStyle: TextStyle(color: Colors.white),
+                        contentPadding: EdgeInsets.all(16.0), // Padding inside the TextField
+                      ),
+                      maxLines: 4,
+                      validator: Validators.requiredField,
+                      onSaved: (value) {
+                        details = value!;
+                      },
+                    ),
+                  ],
                 ),
-                SizedBox(height: 16.0),
-                if (_selectedImage != null)
-                  Image.file(_selectedImage!, height: 200, fit: BoxFit.cover), // Show selected image
-                SizedBox(height: 8.0),
-                ElevatedButton(
+
+                SizedBox(height: 45.0),
+
+                // Image Picker button
+                ElevatedButton.icon(
                   onPressed: _pickImage,
-                  child: Text("Pick an Image"),
+                  icon: Icon(Icons.photo), // Customize icon color
+                  label: Text(
+                    "Upload image", // Customize text color
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFCD5C08), // Background color
+                    foregroundColor: Colors.white, // Ripple effect color when pressed
+                    elevation: 5, // Elevation (shadow)
+                    padding: EdgeInsets.symmetric(horizontal: 25, vertical: 12), // Padding inside button
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30), // Rounded corners
+                    ),
+                  ),
                 ),
-                SizedBox(height: 16.0),
-                if (_isLoading)
-                  Center(child: CircularProgressIndicator()), // Show loading indicator
+
+                // Display selected image (if any)
+                if (_selectedImage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: Image.file(
+                      _selectedImage!,
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+
+                SizedBox(height: 30.0),
+
+                // Submit button
                 ElevatedButton(
-                  onPressed: submitReport,
-                  child: Text("Submit Report"),
+                  onPressed: _isLoading ? null : submitReport, // Disable button if loading
+                  child: _isLoading
+                      ? CircularProgressIndicator(
+                    color: Colors.white, // Spinner color
+                  )
+                      : Text("Submit Report"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFCD5C08), // Background color
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 12.0), // Padding inside button
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30), // Rounded corners
+                    ),
+                  ),
                 ),
               ],
             ),

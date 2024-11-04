@@ -42,8 +42,8 @@ class _AppRouterState extends State<AppRouter> {
           ),
 
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search missing Person',
+            icon: Icon(Icons.list),
+            label: 'List of missing Person',
           ),
         ],
       ),
