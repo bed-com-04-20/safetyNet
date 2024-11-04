@@ -1,9 +1,18 @@
 import 'dart:ui';
 
-hexStringToColor(String hexColor) {
+import 'package:flutter/cupertino.dart';
+
+Color hexStringToColor(String hexColor, {double brightnessFactor = 1.0}) {
   hexColor = hexColor.toUpperCase().replaceAll("#", "");
   if (hexColor.length == 6) {
     hexColor = "FF" + hexColor;
   }
-  return Color(int.parse(hexColor,radix: 16));
+
+  Color color = Color(int.parse(hexColor, radix: 16));
+
+  HSLColor hslColor = HSLColor.fromColor(color);
+
+  hslColor = hslColor.withLightness((hslColor.lightness * brightnessFactor).clamp(0.0, 1.0));
+
+  return hslColor.toColor();
 }

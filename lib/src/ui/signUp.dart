@@ -39,22 +39,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
         User? user = userCredential.user;
 
         if (user != null) {
+          print('User created with UID: ${user.uid}');
+
           await _database.child('users').child(user.uid).set({
             'username': username,
             'email': email,
           });
 
-          print('User registered: $username');
+          print('User data stored in database for UID: ${user.uid}');
 
+          // Navigate to the login screen
           Navigator.pushNamed(context, 'login_screen');
+        } else {
+          print('User is null, could not register.');
         }
       } catch (e) {
         print('Error: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registration failed: $e')),
+        );
+      } finally {
+        setState(() {
+          showSpinner = false;
+        });
       }
-
-      setState(() {
-        showSpinner = false;
-      });
     }
   }
 
@@ -64,8 +72,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
-          color: hexStringToColor("615EFC"),
-        ),
+            gradient: LinearGradient(colors: [
+              hexStringToColor("#f1e0a2"),
+              //hexStringToColor("#d4d4e8"),
+              hexStringToColor("#c2e5e5"),
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).size.height * 0.2, 20, 0),
           child: Form(

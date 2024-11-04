@@ -36,9 +36,9 @@ TextField reusableTextField(String text, IconData icon, bool isPasswordType,
       labelStyle: TextStyle(color: Colors.white.withOpacity(0.9)),
       filled: true,
       floatingLabelBehavior: FloatingLabelBehavior.never,
-      fillColor: Colors.white.withOpacity(0.3),
+      fillColor: Colors.blueAccent.withOpacity(0.3),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(30.0),
+        borderRadius: BorderRadius.circular(10.0),
         borderSide: const BorderSide(width: 0, style: BorderStyle.none)
       ),
     ),
@@ -66,7 +66,7 @@ Container signInSignUpButton(
           child: Text(
             isLogin ? 'LOG IN' : 'SIGN UP',
             style: const TextStyle(
-              color: Colors.blueAccent,
+              color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
@@ -77,7 +77,7 @@ Container signInSignUpButton(
               if (states.contains(WidgetState.pressed)) {
                 return Colors.black26;
               }
-              return Colors.white;
+              return Color(0xFFeb6958);
             }),
             shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),

@@ -7,7 +7,6 @@ import 'LandingPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Initialize Firebase
   await Firebase.initializeApp();
 
   await FirebaseAppCheck.instance.activate(
