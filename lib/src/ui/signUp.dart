@@ -15,9 +15,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Create a reference to the database
   final DatabaseReference _database = FirebaseDatabase.instance.ref();
-  final FirebaseAuth _auth = FirebaseAuth.instance; // Firebase Auth instance
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   bool showSpinner = false;
 
@@ -73,7 +72,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             key: _formKey,
             child: Column(
               children: <Widget>[
-                logoWidget("assets/images/logo.png"),
+                logoWidget("assets/logo.png"),
                 SizedBox(height: 30),
 
                 reusableTextField(

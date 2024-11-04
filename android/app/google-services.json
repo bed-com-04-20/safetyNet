@@ -3,7 +3,7 @@
     "project_number": "1093739828950",
     "firebase_url": "https://safetynet-2adcd-default-rtdb.firebaseio.com",
     "project_id": "safetynet-2adcd",
-    "storage_bucket": "safetynet-2adcd.appspot.com"
+    "storage_bucket": "safetynet-2adcd.firebasestorage.app"
   },
   "client": [
     {

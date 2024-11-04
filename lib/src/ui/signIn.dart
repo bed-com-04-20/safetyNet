@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:safetynet/reusable_widgets/reusable_widgets.dart';
 import 'package:safetynet/src/routing/router.dart';
@@ -13,10 +12,8 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
-  TextEditingController _passwordTextController = TextEditingController();
   TextEditingController _emailTextController = TextEditingController();
-
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  TextEditingController _passwordTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -38,39 +35,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 reusableTextField("Enter Password", Icons.lock_outline, true, _passwordTextController),
                 SizedBox(height: 30),
 
-                signInSignUpButton(context, true, () async {
-                  try {
-                    UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-                      email: _emailTextController.text,
-                      password: _passwordTextController.text,
-                    );
-                    if (userCredential.user == null) {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => AppRouter()));
-                    }
-
-                    } catch (e) {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text('Login Error'),
-                          content: Text(e.toString()),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('OK'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  }
+                signInSignUpButton(context, true, () {
+                  // Simulate a successful login without authentication
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => AppRouter()));
                 }),
 
-                signUpOption()
+                signUpOption(),
               ],
             ),
           ),
@@ -83,19 +53,19 @@ class _RegistrationPageState extends State<RegistrationPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text("Dont have account?",
+        const Text(
+          "Don't have an account?",
           style: TextStyle(color: Colors.white70),
         ),
         GestureDetector(
           onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => SignUpScreen()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => SignUpScreen()));
           },
           child: const Text(
-            " Sign UP",
+            " Sign Up",
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
-        )
+        ),
       ],
     );
   }
