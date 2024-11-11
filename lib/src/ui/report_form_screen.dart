@@ -156,7 +156,8 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
-          color: hexStringToColor("615EFC"),
+          // color: hexStringToColor("615EFC"),
+          color: Color(0xFF0A0933)
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -186,7 +187,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                     labelText: 'Age',
                     labelStyle: TextStyle(fontWeight: FontWeight.bold,
                         color: Colors.white),
-                    hintText: 'Enter estimated age',
+                        hintText: 'Enter estimated age',
                   ),
 
                   validator: Validators.requiredField,
