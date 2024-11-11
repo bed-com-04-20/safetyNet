@@ -19,7 +19,8 @@ class ReportListScreen extends StatelessWidget {
     body: Container(
       height: MediaQuery.of(context).size.height,
       decoration: BoxDecoration(
-        color: hexStringToColor("615EFC"),
+        color: hexStringToColor("#f1e0a2"),
+
       ),
       child: StreamBuilder<QuerySnapshot>(
         stream: reportsCollection.snapshots(),
@@ -52,14 +53,16 @@ class ReportListScreen extends StatelessWidget {
                     // Gradient background for each card
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      // gradient: LinearGradient(
-                      //   colors: [
-                      //     Colors.white,
-                      //     Colors.white
-                      //   ],
-                      //   begin: Alignment.topLeft,
-                      //   end: Alignment.bottomRight,
-                      // ),
+                      gradient: LinearGradient(
+                        colors: [
+
+                          Color(0xFFFFE0B2),
+                          Color(0xFFFBC02D),
+                          Colors.white,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Card(
