@@ -29,17 +29,17 @@ TextField reusableTextField(String text, IconData icon, bool isPasswordType,
     style: TextStyle(color: Colors.white.withOpacity(0.9)),
     decoration: InputDecoration(
       prefixIcon: Icon(
-          icon,
-      color: Colors.white70,
+        icon,
+        color: Colors.white70,
       ),
       labelText: text,
       labelStyle: TextStyle(color: Colors.white.withOpacity(0.9)),
       filled: true,
       floatingLabelBehavior: FloatingLabelBehavior.never,
-      fillColor: Colors.white.withOpacity(0.3),
+      fillColor: Colors.blueAccent.withOpacity(0.3),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(30.0),
-        borderSide: const BorderSide(width: 0, style: BorderStyle.none)
+          borderRadius: BorderRadius.circular(10.0),
+          borderSide: const BorderSide(width: 0, style: BorderStyle.none)
       ),
     ),
     keyboardType: isPasswordType
@@ -49,7 +49,7 @@ TextField reusableTextField(String text, IconData icon, bool isPasswordType,
 }
 
 Container signInSignUpButton(
-  BuildContext context, bool isLogin, Function onTap) {
+    BuildContext context, bool isLogin, Function onTap) {
 
   return Container(
     margin: const EdgeInsets.fromLTRB(0, 10, 0, 20),
@@ -66,18 +66,18 @@ Container signInSignUpButton(
           child: Text(
             isLogin ? 'LOG IN' : 'SIGN UP',
             style: const TextStyle(
-              color: Colors.blueAccent,
+              color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
           ),
           style: ButtonStyle(
-            minimumSize: WidgetStateProperty.all(Size(350, 50)), // Set width and height
+            minimumSize: WidgetStateProperty.all(Size(350, 50)),
             backgroundColor: WidgetStateProperty.resolveWith((states) {
               if (states.contains(WidgetState.pressed)) {
                 return Colors.black26;
               }
-              return Colors.white;
+              return Color(0xFFeb6958);
             }),
             shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),

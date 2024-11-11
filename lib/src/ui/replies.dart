@@ -1,134 +1,186 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../ui/replies.dart'
 
-class ConversationScreen extends StatefulWidget {
-  @override
-  _ConversationScreenState createState() => _ConversationScreenState();
-}
-
-class _ConversationScreenState extends State<ConversationScreen> {
-  final DatabaseReference _database = FirebaseDatabase.instance.ref();
-  final TextEditingController _messageController = TextEditingController();
-  final ImagePicker _picker = ImagePicker();
-  File? _imageFile;
-
-  Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
-    setState(() {
-      if (pickedFile != null) {
-        _imageFile = File(pickedFile.path);
-      }
-    });
-  }
-
-  Future<void> _uploadImage(String messageId) async {
-    if (_imageFile != null) {
-      FirebaseStorage storage = FirebaseStorage.instance;
-      try {
-        String fileName = DateTime.now().toString();
-        Reference ref = storage.ref().child('uploads/$fileName');
-        await ref.putFile(_imageFile!);
-        String downloadURL = await ref.getDownloadURL();
-        // Update the message with the image URL
-        await _database.child('messages').child(messageId).update({
-          'imageUrl': downloadURL,
-        });
-      } catch (e) {
-        print("Error uploading image: $e");
-      }
-    }
-  }
-
-  void _sendMessage(String sender) async {
-    String message = _messageController.text;
-    if (message.isNotEmpty || _imageFile != null) {
-      // Create a new message entry in Realtime Database
-      DatabaseReference newMessageRef = _database.child('messages').push();
-      await newMessageRef.set({
-        'text': message,
-        'sender': sender,
-        'timestamp': DateTime.now().millisecondsSinceEpoch,
-        'imageUrl': null,
-      });
-
-      if (_imageFile != null) {
-        await _uploadImage(newMessageRef.key!);
-        setState(() {
-          _imageFile = null;
-        });
-      }
-
-      _messageController.clear();
-    } else {
-      print('Please type a message or take a photo.');
-    }
-  }
+class ReportListScreen extends StatelessWidget {
+  final CollectionReference reportsCollection =
+  FirebaseFirestore.instance.collection('missing_person_reports');
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Conversation')),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder(
-              stream: _database.child('messages').orderByChild('timestamp').onValue,
-              builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
-                if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
-                }
+      backgroundColor: Color(0xFFE18888),
+      appBar: AppBar(
+        title: Text('Missing Person Reports'),
+      ),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+          color: Color(0xFF0A0933),
+        ),
+        child: StreamBuilder<QuerySnapshot>(
+          stream: reportsCollection.snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(child: Text('Error fetching reports'));
+            }
 
-                Map<dynamic, dynamic> messages = (snapshot.data!.snapshot.value as Map<dynamic, dynamic>);
-                List<Map<dynamic, dynamic>> messageList = messages.entries
-                    .map((entry) => entry.value as Map<dynamic, dynamic>)
-                    .toList();
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
 
-                return ListView.builder(
-                  itemCount: messageList.length,
-                  itemBuilder: (context, index) {
-                    var message = messageList[index];
-                    bool isAdmin = message['sender'] == 'admin';
-                    return ListTile(
-                      title: Text(message['text'] ?? ''),
-                      subtitle: message['imageUrl'] != null
-                          ? Image.network(message['imageUrl'])
-                          : null,
-                      trailing: isAdmin ? Icon(Icons.admin_panel_settings) : null,
-                      leading: isAdmin ? null : Icon(Icons.person),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: InputDecoration(
-                      labelText: 'Type your message...',
-                      border: OutlineInputBorder(),
+            if (snapshot.hasData) {
+              final reports = snapshot.data!.docs;
+
+              return ListView.builder(
+                itemCount: reports.length,
+                itemBuilder: (context, index) {
+                  var doc = reports[index];
+                  String name = doc['missingPersonName'] ?? 'Unknown';
+                  String lastSeen = doc['lastSeen'] ?? 'Unknown';
+                  String location = doc['location'] ?? 'Unknown';
+                  String details = doc['details'] ?? 'No details provided';
+                  String imageUrl = doc['imageUrl'] ?? '';
+
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailScreen(
+                              name: name,
+                              lastSeen: lastSeen,
+                              location: location,
+                              details: details,
+                              imageUrl: imageUrl,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.lightBlue,
+                        ),
+                        child: Card(
+                          color: Colors.transparent,
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (imageUrl.isNotEmpty)
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: CachedNetworkImage(
+                                          imageUrl: imageUrl,
+                                          height: 100,
+                                          width: 100,
+                                          fit: BoxFit.cover,
+                                          placeholder: (context, url) =>
+                                              CircularProgressIndicator(),
+                                          errorWidget: (context, url, error) =>
+                                              Icon(Icons.error, color: Colors.red, size: 100),
+                                        ),
+                                      )
+                                    else
+                                      Container(
+                                        height: 100,
+                                        width: 100,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[300],
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: Icon(
+                                          Icons.person,
+                                          size: 50,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    SizedBox(width: 16.0),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            name,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18.0,
+                                            ),
+                                          ),
+                                          SizedBox(height: 8.0),
+                                          Text(
+                                            'Last Seen: $lastSeen',
+                                            style: TextStyle(
+                                              fontSize: 16.0,
+                                              color: Colors.black54,
+                                            ),
+                                          ),
+                                          SizedBox(height: 8.0),
+                                          Text(
+                                            'Location: $location',
+                                            style: TextStyle(
+                                              fontSize: 16.0,
+                                              color: Colors.black54,
+                                            ),
+                                          ),
+                                          SizedBox(height: 8.0),
+                                          Text(
+                                            'Details: $details',
+                                            style: TextStyle(
+                                              fontSize: 14.0,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ConversationScreen(),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      'Reply',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    style: ButtonStyle(
+                                      backgroundColor: MaterialStateProperty.all(Colors.blue),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.camera_alt),
-                  onPressed: _pickImage,
-                ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () => _sendMessage('user'),
-                ),
-              ],
-            ),
-          ),
-        ],
+                  );
+                },
+              );
+            }
+
+            return Center(child: Text('No reports found'));
+          },
+        ),
       ),
     );
   }

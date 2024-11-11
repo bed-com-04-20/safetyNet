@@ -66,7 +66,7 @@ class _HomePageState extends State<HomePage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0), // Adjust to match dock padding
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
             label,
             style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
@@ -74,7 +74,7 @@ class _HomePageState extends State<HomePage> {
         ),
         SizedBox(height: 10),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0), // Same horizontal padding
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: SizedBox(
             height: 180,
             child: ListView.builder(

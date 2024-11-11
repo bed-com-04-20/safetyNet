@@ -23,11 +23,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-              hexStringToColor("#f1e0a2"),
-              //hexStringToColor("#d4d4e8"),
-              hexStringToColor("#c2e5e5"),
-            ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+          color: Color(0xFF0A0933),
+        ),
         child: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).size.height * 0.2, 20, 0),
