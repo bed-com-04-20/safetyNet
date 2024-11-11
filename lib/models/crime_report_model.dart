@@ -2,7 +2,7 @@ class CrimeReportModel {
   final String street;
   final String city;
   final String crimeDetails;
-  final String? imageUrl; // Optional image URL field for the uploaded image
+  final String? imageUrl;
   final DateTime timestamp;
 
   CrimeReportModel({
