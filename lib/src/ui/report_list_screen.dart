@@ -11,7 +11,7 @@ class ReportListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Color(0xFFE18888),
+      backgroundColor: Color(0xFFE18888),
       appBar: AppBar(
         title: Text('Missing Person Reports'),
       ),
