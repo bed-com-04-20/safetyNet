@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:safetynet/reusable_widgets/reusable_widgets.dart';
-import 'package:safetynet/src/ui/replies.dart';
-import 'package:safetynet/utils/colors_utils.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -79,7 +76,7 @@ class _HomePageState extends State<HomePage> {
             height: 180,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: 4, // Ensures at least 4 boxes
+              itemCount: 4,
               itemBuilder: (context, index) {
                 return Padding(
                   padding: const EdgeInsets.only(right: 10),
