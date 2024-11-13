@@ -32,8 +32,8 @@ class _AppRouterState extends State<AppRouter> {
 
           // Floating Bottom Navigation Bar
           Positioned(
-            left: 30,
-            right: 30,
+            left: 20,
+            right: 20,
             bottom: 20,
             child: Container(
               decoration: BoxDecoration(
@@ -48,8 +48,9 @@ class _AppRouterState extends State<AppRouter> {
                   ),
                 ],
               ),
+
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(50),
                 child: BottomNavigationBar(
                   onTap: onTabTapped,
                   currentIndex: _currentIndex,
@@ -61,10 +62,12 @@ class _AppRouterState extends State<AppRouter> {
                       icon: Icon(Icons.home),
                       label: 'Home',
                     ),
+
                     BottomNavigationBarItem(
                       icon: Icon(Icons.person),
                       label: 'Report missing person',
                     ),
+
                     BottomNavigationBarItem(
                       icon: Icon(Icons.list),
                       label: 'Missing persons',

@@ -87,7 +87,7 @@ class _HomePageState extends State<HomePage> {
                     borderRadius: BorderRadius.circular(8.0),
                     child: Container(
                       width: 160,
-                      color: Colors.white24,
+                      color: Colors.blueAccent.withOpacity(0.3),
                       child: Image.asset(
                         placeholderImageUrl,
                         fit: BoxFit.cover,

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io'; // For File type
-import 'package:firebase_storage/firebase_storage.dart'; // For file uploads
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import '../../models/report_model.dart';
 import '../../services/firestore_service.dart';
-import '../../utils/colors_utils.dart';
 import '../../utils/validators.dart';
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../reusable_widgets/reusable_widgets.dart'; // Import reusable widgets
 
 class ReportFormScreen extends StatefulWidget {
   const ReportFormScreen({super.key});
@@ -20,10 +20,10 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final FirestoreService _firestoreService = FirestoreService();
   DateTime? _selectedDate;
-  final TextEditingController _dateController = TextEditingController(); // Controller for date field
-  File? _selectedImage; // This will hold the selected image file
-  String? _imageUrl; // This will store the image URL after upload
-  final ImagePicker _picker = ImagePicker(); // To pick images
+  final TextEditingController _dateController = TextEditingController();
+  File? _selectedImage;
+  String? _imageUrl;
+  final ImagePicker _picker = ImagePicker();
 
   // Form fields
   String missingPersonName = '';
@@ -35,10 +35,8 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
   final DateFormat _dateFormatter = DateFormat('yyyy-MM-dd');
 
-  // Loading state
-  bool _isLoading = false; // To track loading state
+  bool _isLoading = false;
 
-  // Pick an image from the gallery
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -48,7 +46,6 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     }
   }
 
-  // Upload the image to Firebase Storage
   Future<String> _uploadImage(File image) async {
     try {
       final storageRef = FirebaseStorage.instance.ref().child('missing_persons/${DateTime.now()}.jpg');
@@ -60,22 +57,19 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     }
   }
 
-  // Check for duplicate report details
   Future<bool> _checkForDuplicateReport() async {
     final reportsCollection = FirebaseFirestore.instance.collection('missing_person_reports');
     final querySnapshot = await reportsCollection
-        .where('details', isEqualTo: details) // Check if details match
+        .where('details', isEqualTo: details)
         .get();
 
-    return querySnapshot.docs.isNotEmpty; // Return true if duplicates exist
+    return querySnapshot.docs.isNotEmpty;
   }
 
-  // Submit the form to Firestore
   Future<void> submitReport() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      // Check for duplicate report
       final isDuplicate = await _checkForDuplicateReport();
       if (isDuplicate) {
         showDialog(
@@ -91,14 +85,13 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
             ],
           ),
         );
-        return; // Exit if duplicate is found
+        return;
       }
 
       setState(() {
-        _isLoading = true; // Set loading state to true
+        _isLoading = true;
       });
 
-      // If an image is selected, upload it
       if (_selectedImage != null) {
         _imageUrl = await _uploadImage(_selectedImage!);
       }
@@ -137,16 +130,15 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
         print("Error submitting report: $error");
       } finally {
         setState(() {
-          _isLoading = false; // Set loading state to false
+          _isLoading = false;
         });
       }
     }
   }
 
-  //to display the date after being picked-up
   @override
   void dispose() {
-    _dateController.dispose(); // Dispose controller when done
+    _dateController.dispose();
     super.dispose();
   }
 
@@ -156,8 +148,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
-          // color: hexStringToColor("615EFC"),
-          color: Color(0xFF0A0933)
+          color: Color(0xFF0A0933),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -168,62 +159,44 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Name',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold,
-                    color: Colors.white),
-                    hintText: 'Enter a name of a missing person',
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    hintText: 'Enter the name of the missing person',
                   ),
-
                   validator: Validators.requiredField,
                   onSaved: (value) {
                     missingPersonName = value!;
                   },
                 ),
-
                 SizedBox(height: 16.0),
-
-
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Age',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                        hintText: 'Enter estimated age',
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    hintText: 'Enter estimated age',
                   ),
-
                   validator: Validators.requiredField,
                   onSaved: (value) {
                     age = value!;
                   },
                 ),
-
                 SizedBox(height: 16.0),
-
-                // Input for missing person gender
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Gender',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold,
-                    color: Colors.white),
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                     hintText: 'Enter gender',
                   ),
-
                   validator: Validators.requiredField,
                   onSaved: (value) {
                     gender = value!;
                   },
                 ),
-
                 SizedBox(height: 16.0),
-
-                // Date Picker for Last Seen
                 TextFormField(
-                  controller: _dateController, // Attach controller here
+                  controller: _dateController,
                   decoration: InputDecoration(
                     labelText: 'Last Seen',
-                    labelStyle: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                     hintText: 'Choose Date',
                   ),
                   validator: (value) {
@@ -243,7 +216,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                     if (pickedDate != null) {
                       setState(() {
                         _selectedDate = pickedDate;
-                        _dateController.text = _dateFormatter.format(pickedDate); // Display the picked date
+                        _dateController.text = _dateFormatter.format(pickedDate);
                       });
                     }
                   },
@@ -255,14 +228,11 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                   },
                 ),
                 SizedBox(height: 16.0),
-
-                // Input for location
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Location',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                    hintText: 'Provide where s/he was lastly seen',
+                    labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    hintText: 'Provide where the person was last seen',
                   ),
                   validator: Validators.requiredField,
                   onSaved: (value) {
@@ -270,25 +240,20 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                   },
                 ),
                 SizedBox(height: 16.0),
-
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Details',
-                      style: TextStyle(
-                        fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white
-                      ),
+                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                    SizedBox(height: 8.0), // Space between label and TextField
+                    SizedBox(height: 8.0),
                     TextFormField(
                       decoration: InputDecoration(
-                        hintText: 'Provide any additional information that will help to find the person',
-                        border: OutlineInputBorder(), // Rectangular border
+                        hintText: 'Provide additional information to help find the person',
+                        border: OutlineInputBorder(),
                         labelStyle: TextStyle(color: Colors.white),
-                        contentPadding: EdgeInsets.all(16.0), // Padding inside the TextField
+                        contentPadding: EdgeInsets.all(16.0),
                       ),
                       maxLines: 4,
                       validator: Validators.requiredField,
@@ -298,25 +263,14 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                     ),
                   ],
                 ),
-
                 SizedBox(height: 45.0),
 
-                // Image Picker button
-                ElevatedButton.icon(
-                  onPressed: _pickImage,
-                  icon: Icon(Icons.photo), // Customize icon color
-                  label: Text(
-                    "Upload image", // Customize text color
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFCD5C08), // Background color
-                    foregroundColor: Colors.white, // Ripple effect color when pressed
-                    elevation: 5, // Elevation (shadow)
-                    padding: EdgeInsets.symmetric(horizontal: 25, vertical: 12), // Padding inside button
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30), // Rounded corners
-                    ),
-                  ),
+                // Image Picker button using reusableButton
+                reusableButton(
+                  context,
+                  "Upload Image",
+                  _pickImage,
+                  icon: Icons.photo,
                 ),
 
                 // Display selected image (if any)
@@ -333,22 +287,12 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
                 SizedBox(height: 30.0),
 
-                // Submit button
-                ElevatedButton(
-                  onPressed: _isLoading ? null : submitReport, // Disable button if loading
-                  child: _isLoading
-                      ? CircularProgressIndicator(
-                    color: Colors.white, // Spinner color
-                  )
-                      : Text("Submit Report"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFCD5C08), // Background color
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 12.0), // Padding inside button
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30), // Rounded corners
-                    ),
-                  ),
+                // Submit button using reusableButton
+                reusableButton(
+                  context,
+                  "Submit Report",
+                  (_isLoading ? null : submitReport) as Function,
+                  icon: Icons.send,
                 ),
               ],
             ),

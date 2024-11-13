@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:safetynet/reusable_widgets/reusable_widgets.dart';
-import 'package:safetynet/utils/colors_utils.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -72,7 +71,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
-            color: Color(0xFF0A0933),
+          color: Color(0xFF0A0933),
         ),
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).size.height * 0.2, 20, 0),
@@ -107,11 +106,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 SizedBox(height: 30),
 
-                signInSignUpButton(
-                  context,
-                  false,
-                  _register,
-                ),
+                // Use the reusableButton for "SIGN UP"
+                reusableButton(context, 'SIGN UP', _register),
+
                 SizedBox(height: 20),
               ],
             ),

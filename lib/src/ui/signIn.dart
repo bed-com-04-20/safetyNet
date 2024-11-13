@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:safetynet/reusable_widgets/reusable_widgets.dart';
 import 'package:safetynet/src/routing/router.dart';
-import 'package:safetynet/src/ui/signUp.dart';
-import 'package:safetynet/utils/colors_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:safetynet/src/ui/signUp.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'admins_approval.dart';
 
-class RegistrationPage extends StatefulWidget {
-  const RegistrationPage({super.key});
+class SignInPage extends StatefulWidget {
+  const SignInPage({super.key});
 
   @override
-  State<RegistrationPage> createState() => _RegistrationPageState();
+  State<SignInPage> createState() => _SignInPageState();
 }
 
-class _RegistrationPageState extends State<RegistrationPage> {
+class _SignInPageState extends State<SignInPage> {
   final TextEditingController _emailTextController = TextEditingController();
   final TextEditingController _passwordTextController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -32,13 +33,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
               children: <Widget>[
                 logoWidget("assets/logo.png"),
                 SizedBox(height: 30),
-                reusableTextField("Enter username", Icons.person_outline, false, _emailTextController),
+                reusableTextField("Enter Email", Icons.email_outlined, false, _emailTextController),
                 SizedBox(height: 30),
                 reusableTextField("Enter Password", Icons.lock_outline, true, _passwordTextController),
                 SizedBox(height: 30),
 
-                signInSignUpButton(context, true, () async {
-                  // Firebase authentication login
+                // Sign-In Button with Role Check
+                reusableButton(context, 'SIGN IN', () async {
                   try {
                     final userCredential = await _auth.signInWithEmailAndPassword(
                       email: _emailTextController.text.trim(),
@@ -46,12 +47,40 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     );
 
                     if (userCredential.user != null) {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => AppRouter()));
+                      // Access the Realtime Database and check the user's role
+                      final DatabaseReference userRef = FirebaseDatabase.instance
+                          .ref()
+                          .child('users')
+                          .child(userCredential.user!.uid);
+
+                      userRef.once().then((DatabaseEvent event) {
+                        final snapshot = event.snapshot;
+                        if (snapshot.exists) {
+                          final data = snapshot.value as Map<dynamic, dynamic>?;
+                          final role = data?['role'];
+                          print("User role fetched from Realtime Database: $role");
+
+                          if (role == 'admin') {
+                            // Navigate to ImageManagementPage if user is an admin
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => ImageManagementPage()),
+                            );
+                          } else {
+                            // Navigate to a regular user page if not an admin
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => AppRouter()),
+                            );
+                          }
+                        } else {
+                          print("User document does not exist in Realtime Database.");
+                        }
+                      });
                     }
                   } catch (e) {
-                    // Show error message if login fails
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Login failed: ${e.toString()}")),
+                      SnackBar(content: Text("Sign-In failed: ${e.toString()}")),
                     );
                   }
                 }),

@@ -34,7 +34,7 @@ class SwipePages extends StatelessWidget {
       body: PageView(
         children: [
           WelcomePage(),
-          RegistrationPage()
+          SignInPage()
         ],
       ),
     );
