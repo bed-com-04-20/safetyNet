@@ -1,168 +1,198 @@
-import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_database/firebase_database.dart';
+import '../../services/firestore_service.dart';
 
-class ImageManagementPage extends StatefulWidget {
-  const ImageManagementPage({super.key});
-
+class AdminReportScreen extends StatefulWidget {
   @override
-  State<ImageManagementPage> createState() => _ImageManagementPageState();
+  _AdminReportScreenState createState() => _AdminReportScreenState();
 }
 
-class _ImageManagementPageState extends State<ImageManagementPage> {
-  final DatabaseReference _dbRef = FirebaseDatabase.instance.ref("images");
-  final FirebaseStorage _storage = FirebaseStorage.instance;
-  final List<Map<String, String>> _images = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchImagesFromDatabase();
-  }
-
-  // Fetch images from Firebase Realtime Database
-  Future<void> _fetchImagesFromDatabase() async {
-    _dbRef.onValue.listen((event) {
-      final data = event.snapshot.value as Map<dynamic, dynamic>? ?? {};
-      setState(() {
-        _images.clear();
-        data.forEach((key, value) {
-          _images.add({"id": key, "url": value["url"]});
-        });
-      });
-    });
-  }
-
-  // Upload image to Firebase Storage
-  Future<void> _uploadImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      final file = File(pickedFile.path);
-      final fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      final ref = _storage.ref().child("images/$fileName");
-
-      try {
-        await ref.putFile(file);
-        final url = await ref.getDownloadURL();
-        final newRef = _dbRef.push();
-        await newRef.set({"url": url});
-      } catch (e) {
-        _showError(e.toString());
-      }
-    }
-  }
-
-  // Update an image in Firebase
-  Future<void> _updateImage(String id) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      final file = File(pickedFile.path);
-      final fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      final ref = _storage.ref().child("images/$fileName");
-
-      try {
-        await ref.putFile(file);
-        final url = await ref.getDownloadURL();
-        await _dbRef.child(id).update({"url": url});
-      } catch (e) {
-        _showError(e.toString());
-      }
-    }
-  }
-
-  // Delete an image from Firebase
-  Future<void> _deleteImage(String id, String url) async {
-    try {
-      final ref = _storage.refFromURL(url);
-      await ref.delete();
-      await _dbRef.child(id).remove();
-    } catch (e) {
-      _showError(e.toString());
-    }
-  }
-
-  // Show error messages
-  void _showError(String error) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Error: $error")),
-    );
-  }
+class _AdminReportScreenState extends State<AdminReportScreen> {
+  final FirestoreService _firestoreService = FirestoreService();
+  String _selectedStatusFilter = "All"; // Filter for report status
+  final List<String> _statusOptions = ["All", "submitted", "seen", "approved"];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Image Management"),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Button to upload a new image
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton.icon(
-              onPressed: _uploadImage,
-              icon: const Icon(Icons.add_a_photo),
-              label: const Text("Upload New Image"),
-            ),
-          ),
-          const Divider(),
-
-          // Display images in a grid
-          Expanded(
-            child: _images.isNotEmpty
-                ? GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: _images.length,
-              itemBuilder: (context, index) {
-                final image = _images[index];
-                return Card(
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: Image.network(
-                          image["url"]!,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
+        title: Text("Manage Reports"),
+        actions: [
+          // Notification badge for new reports
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('missing_person_reports')
+                .where('status', isEqualTo: 'submitted')
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) return Container();
+              int newReportsCount = snapshot.data!.docs.length;
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Icon(Icons.notifications),
+                    if (newReportsCount > 0)
+                      Positioned(
+                        right: 0,
+                        child: Container(
+                          padding: EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          constraints: BoxConstraints(minWidth: 16, minHeight: 16),
+                          child: Text(
+                            '$newReportsCount',
+                            style: TextStyle(color: Colors.white, fontSize: 10),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          IconButton(
-                            onPressed: () => _updateImage(image["id"]!),
-                            icon: const Icon(Icons.edit),
-                            tooltip: "Update Image",
-                          ),
-                          IconButton(
-                            onPressed: () =>
-                                _deleteImage(image["id"]!, image["url"]!),
-                            icon: const Icon(Icons.delete),
-                            color: Colors.red,
-                            tooltip: "Delete Image",
-                          ),
-                        ],
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Filter dropdown for status
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: DropdownButton<String>(
+              value: _selectedStatusFilter,
+              onChanged: (newValue) {
+                setState(() {
+                  _selectedStatusFilter = newValue!;
+                });
+              },
+              items: _statusOptions.map((status) {
+                return DropdownMenuItem(
+                  value: status,
+                  child: Text(status),
+                );
+              }).toList(),
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('missing_person_reports')
+                  .where(
+                'status',
+                isEqualTo: _selectedStatusFilter != "All" ? _selectedStatusFilter : null,
+              )
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+
+                final reports = snapshot.data!.docs;
+                if (reports.isEmpty) {
+                  return Center(child: Text("No reports found"));
+                }
+
+                return ListView.builder(
+                  itemCount: reports.length,
+                  itemBuilder: (context, index) {
+                    var report = reports[index];
+                    return Card(
+                      margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+                      child: ListTile(
+                        title: Text(report['missingPersonName']),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Status: ${report['status']}'),
+                            Text('Details: ${report['details']}'),
+                          ],
+                        ),
+                        trailing: Column(
+                          children: [
+                            // Toggle visibility
+                            Switch(
+                              value: report['visibleToUsers'] ?? false,
+                              onChanged: (value) {
+                                _firestoreService.updateReportVisibility(
+                                  report.id,
+                                  value,
+                                );
+                              },
+                            ),
+                            Text("Visible to users"),
+                          ],
+                        ),
+                        onTap: () async {
+                          await showDialog(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                              title: Text("Update Report"),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // Dropdown for status update
+                                  DropdownButton<String>(
+                                    value: report['status'],
+                                    items: ["submitted", "seen", "approved"]
+                                        .map((status) => DropdownMenuItem(
+                                      child: Text(status),
+                                      value: status,
+                                    ))
+                                        .toList(),
+                                    onChanged: (value) {
+                                      if (value != null) {
+                                        _firestoreService.updateReportStatus(
+                                          report.id,
+                                          value,
+                                          report['visibleToUsers'] ?? false,
+                                        );
+                                        Navigator.pop(context);
+                                      }
+                                    },
+                                  ),
+                                  SizedBox(height: 10),
+                                  // Button to delete report
+                                  TextButton(
+                                    onPressed: () async {
+                                      bool confirm = await showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: Text("Delete Report"),
+                                          content: Text("Are you sure you want to delete this report?"),
+                                          actions: [
+                                            TextButton(
+                                              child: Text("Cancel"),
+                                              onPressed: () => Navigator.pop(context, false),
+                                            ),
+                                            TextButton(
+                                              child: Text("Delete"),
+                                              onPressed: () => Navigator.pop(context, true),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                      if (confirm) {
+                                        await _firestoreService.deleteReport(report.id);
+                                        Navigator.pop(context);
+                                      }
+                                    },
+                                    child: Text("Delete Report"),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 );
               },
-            )
-                : const Center(
-              child: Text(
-                "No images uploaded yet. Use the button above to add images.",
-                textAlign: TextAlign.center,
-              ),
             ),
           ),
         ],

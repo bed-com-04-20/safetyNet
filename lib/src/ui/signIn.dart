@@ -64,7 +64,7 @@ class _SignInPageState extends State<SignInPage> {
                             // Navigate to ImageManagementPage if user is an admin
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(builder: (context) => ImageManagementPage()),
+                              MaterialPageRoute(builder: (context) => AdminReportScreen()),
                             );
                           } else {
                             // Navigate to a regular user page if not an admin

@@ -1,5 +1,4 @@
 class ReportModel {
-  String? id;
   final String missingPersonName;
   final String age;
   final String gender;
@@ -8,10 +7,10 @@ class ReportModel {
   final String details;
   final String? imageUrl;
   final DateTime timestamp;
-
+  final String status;
+  final bool isApproved;
 
   ReportModel({
-    this.id,
     required this.missingPersonName,
     required this.age,
     required this.gender,
@@ -20,31 +19,22 @@ class ReportModel {
     required this.details,
     this.imageUrl,
     required this.timestamp,
+    this.status = 'submitted',
+    this.isApproved = false,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'missingPersonName': missingPersonName,
-      'age' : age,
+      'age': age,
       'gender': gender,
       'lastSeen': lastSeen,
       'location': location,
       'details': details,
       'imageUrl': imageUrl,
       'timestamp': timestamp.toIso8601String(),
+      'status': status,
+      'isApproved': isApproved,
     };
-  }
-
-  factory ReportModel.fromMap(Map<String, dynamic> map) {
-    return ReportModel(
-      //id: map['id'], // This line assumes you stored the id in the map
-      missingPersonName: map['missingPersonName'],
-      age: map['age'],
-      gender: map['gender'],
-      lastSeen: map['lastSeen'],
-      location: map['location'],
-      details: map['details'],
-      timestamp: DateTime.parse(map['timestamp']),
-    );
   }
 }

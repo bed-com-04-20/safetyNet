@@ -96,6 +96,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
         _imageUrl = await _uploadImage(_selectedImage!);
       }
 
+      // Set the initial status as "submitted" and isApproved as false
       ReportModel newReport = ReportModel(
         missingPersonName: missingPersonName,
         age: age,
@@ -103,8 +104,10 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
         lastSeen: lastSeen,
         location: location,
         details: details,
-        imageUrl: _imageUrl, // Save the image URL
+        imageUrl: _imageUrl,
         timestamp: DateTime.now(),
+        status: "submitted",
+        isApproved: false,
       );
 
       try {
@@ -113,13 +116,13 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
           context: context,
           builder: (context) => AlertDialog(
             title: Text("Report Submitted"),
-            content: Text("The missing person report has been successfully submitted."),
+            content: Text("The missing person report has been successfully submitted for review."),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  _formKey.currentState!.reset(); // Reset the form
-                  _selectedImage = null; // Reset selected image
+                  _formKey.currentState!.reset();
+                  _selectedImage = null;
                 },
                 child: Text("OK"),
               ),
@@ -291,7 +294,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 reusableButton(
                   context,
                   "Submit Report",
-                  (_isLoading ? null : submitReport) as Function,
+                  submitReport,
                   icon: Icons.send,
                 ),
               ],

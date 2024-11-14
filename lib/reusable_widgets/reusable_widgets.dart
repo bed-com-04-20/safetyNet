@@ -8,33 +8,33 @@ Image logoWidget(String imageName) {
     fit: BoxFit.fitWidth,
     width: 240,
     height: 240,
-    color: Colors.white,
+    color: Colors.white, // Logo color remains white by default
     errorBuilder: (context, error, stackTrace) {
-      return Icon(Icons.error, size: 240, color: Colors.red);
+      return Icon(Icons.error, size: 240, color: Colors.red); // Error icon color set to red
     },
   );
 }
 
 /// A reusable text field widget with configurable icon and password visibility.
 TextField reusableTextField(String text, IconData icon, bool isPasswordType,
-    TextEditingController controller) {
+    TextEditingController controller, {Color iconColor = Colors.white70, Color fillColor = Colors.blueAccent}) {
   return TextField(
     controller: controller,
     obscureText: isPasswordType,
     enableSuggestions: !isPasswordType,
     autocorrect: !isPasswordType,
-    cursorColor: Colors.white,
+    cursorColor: Colors.white, // Cursor color remains white
     style: TextStyle(color: Colors.white.withOpacity(0.9)),
     decoration: InputDecoration(
       prefixIcon: Icon(
         icon,
-        color: Colors.white70,
+        color: iconColor, // Custom icon color passed as parameter
       ),
       labelText: text,
       labelStyle: TextStyle(color: Colors.white.withOpacity(0.9)),
       filled: true,
       floatingLabelBehavior: FloatingLabelBehavior.never,
-      fillColor: Colors.blueAccent.withOpacity(0.3),
+      fillColor: fillColor.withOpacity(0.3), // Custom fill color passed as parameter
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10.0),
         borderSide: const BorderSide(width: 0, style: BorderStyle.none),
@@ -49,7 +49,7 @@ TextField reusableTextField(String text, IconData icon, bool isPasswordType,
 /// A reusable button widget that accepts custom text, onTap functionality, and an optional icon.
 Container reusableButton(
     BuildContext context, String buttonText, Function onTap,
-    {IconData? icon}) {
+    {IconData? icon, Color buttonColor = const Color(0xFFeb6958), Color textColor = Colors.white}) {
   return Container(
     margin: const EdgeInsets.fromLTRB(0, 10, 0, 20),
     decoration: BoxDecoration(
@@ -59,11 +59,11 @@ Container reusableButton(
       onPressed: () {
         onTap();
       },
-      icon: icon != null ? Icon(icon, size: 20, color: Colors.white) : const SizedBox.shrink(),
+      icon: icon != null ? Icon(icon, size: 20, color: textColor) : const SizedBox.shrink(),
       label: Text(
         buttonText,
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: textColor, // Custom text color passed as parameter
           fontWeight: FontWeight.bold,
           fontSize: 16,
         ),
@@ -74,7 +74,7 @@ Container reusableButton(
           if (states.contains(MaterialState.pressed)) {
             return Colors.black26;
           }
-          return Color(0xFFeb6958);
+          return buttonColor; // Custom button color passed as parameter
         }),
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
