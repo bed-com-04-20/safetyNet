@@ -162,9 +162,10 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Name',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    labelStyle: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
                     hintText: 'Enter the name of the missing person',
                   ),
+                  style: TextStyle(color: Colors.white),
                   validator: Validators.requiredField,
                   onSaved: (value) {
                     missingPersonName = value!;
@@ -174,9 +175,10 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Age',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    labelStyle: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
                     hintText: 'Enter estimated age',
                   ),
+                  style: TextStyle(color: Colors.white),
                   validator: Validators.requiredField,
                   onSaved: (value) {
                     age = value!;
@@ -186,9 +188,10 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Gender',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    labelStyle: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
                     hintText: 'Enter gender',
                   ),
+                  style: TextStyle(color: Colors.white),
                   validator: Validators.requiredField,
                   onSaved: (value) {
                     gender = value!;
@@ -199,9 +202,10 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                   controller: _dateController,
                   decoration: InputDecoration(
                     labelText: 'Last Seen',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    labelStyle: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
                     hintText: 'Choose Date',
                   ),
+                  style: TextStyle(color: Colors.white),
                   validator: (value) {
                     if (_selectedDate == null) {
                       return 'Please choose a date';
@@ -234,9 +238,10 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: 'Location',
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    labelStyle: TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold, color: Colors.white),
                     hintText: 'Provide where the person was last seen',
                   ),
+                  style: TextStyle(color: Colors.white),
                   validator: Validators.requiredField,
                   onSaved: (value) {
                     location = value!;
@@ -256,8 +261,8 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                         hintText: 'Provide additional information to help find the person',
                         border: OutlineInputBorder(),
                         labelStyle: TextStyle(color: Colors.white),
-                        contentPadding: EdgeInsets.all(16.0),
                       ),
+                      style: TextStyle(color: Colors.white),
                       maxLines: 4,
                       validator: Validators.requiredField,
                       onSaved: (value) {

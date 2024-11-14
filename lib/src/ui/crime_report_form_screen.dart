@@ -77,7 +77,7 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  _formKey.currentState!.reset(); // Reset the form
+                  _formKey.currentState!.reset();
                 },
                 child: Text("OK"),
               ),
