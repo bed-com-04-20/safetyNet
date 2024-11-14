@@ -9,7 +9,7 @@ class AdminReportScreen extends StatefulWidget {
 
 class _AdminReportScreenState extends State<AdminReportScreen> {
   final FirestoreService _firestoreService = FirestoreService();
-  String _selectedStatusFilter = "All"; // Filter for report status
+  String _selectedStatusFilter = "All";
   final List<String> _statusOptions = ["All", "submitted", "seen", "approved"];
 
   @override
@@ -98,22 +98,23 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
                   itemCount: reports.length,
                   itemBuilder: (context, index) {
                     var report = reports[index];
+                    var reportData = report.data() as Map<String, dynamic>;
                     return Card(
                       margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
                       child: ListTile(
-                        title: Text(report['missingPersonName']),
+                        title: Text(reportData['missingPersonName'] ?? 'Unknown'),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Status: ${report['status']}'),
-                            Text('Details: ${report['details']}'),
+                            Text('Status: ${reportData['status'] ?? 'N/A'}'),
+                            Text('Details: ${reportData['details'] ?? 'No details available'}'),
                           ],
                         ),
                         trailing: Column(
                           children: [
                             // Toggle visibility
                             Switch(
-                              value: report['visibleToUsers'] ?? false,
+                              value: reportData['visibleToUsers'] ?? false,
                               onChanged: (value) {
                                 _firestoreService.updateReportVisibility(
                                   report.id,
@@ -134,7 +135,7 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
                                 children: [
                                   // Dropdown for status update
                                   DropdownButton<String>(
-                                    value: report['status'],
+                                    value: reportData['status'] ?? 'submitted',
                                     items: ["submitted", "seen", "approved"]
                                         .map((status) => DropdownMenuItem(
                                       child: Text(status),
@@ -146,7 +147,7 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
                                         _firestoreService.updateReportStatus(
                                           report.id,
                                           value,
-                                          report['visibleToUsers'] ?? false,
+                                          reportData['visibleToUsers'] ?? false,
                                         );
                                         Navigator.pop(context);
                                       }

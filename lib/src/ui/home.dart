@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:safetynet/src/ui/report_list_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -47,6 +48,14 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           _selectedIndex = index;
         });
+
+        if (text == 'Missing persons') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ReportListScreen()),
+          );
+        }
+
       },
       style: OutlinedButton.styleFrom(
         foregroundColor: Colors.white,
