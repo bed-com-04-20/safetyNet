@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height: 20),
             buildMissingPersonsSection(),
             SizedBox(height: 20),
-            buildMissingPersonsSection(), // Duplicate for testing purposes; remove if not needed
+            buildMissingPersonsSection(),
           ],
         ),
       ),
@@ -86,8 +86,8 @@ class _HomePageState extends State<HomePage> {
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('missing_person_reports')
-                  .where('status', isEqualTo: 'approved') // Only approved reports
-                  .where('visibleToUsers', isEqualTo: true) // Visible to users
+                  .where('status', isEqualTo: 'approved')
+                  .where('visibleToUsers', isEqualTo: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -105,11 +105,10 @@ class _HomePageState extends State<HomePage> {
                   itemBuilder: (context, index) {
                     var report = reports[index];
                     String name = report['missingPersonName'] ?? 'Unknown';
-                    String imageUrl = report['imageUrl'] ?? ''; // Get the actual image URL here
+                    String imageUrl = report['imageUrl'] ?? '';
 
-                    // If no image is provided, use the placeholder icon
                     if (imageUrl.isEmpty) {
-                      imageUrl = ''; // Empty to signify no image, and we'll use the icon
+                      imageUrl = '';
                     }
 
                     return Padding(
@@ -129,7 +128,7 @@ class _HomePageState extends State<HomePage> {
                                   errorBuilder: (context, error, stackTrace) =>
                                       Icon(Icons.person, size: 80, color: Colors.grey),
                                 )
-                                    : Icon(Icons.person, size: 80, color: Colors.grey), // Use icon as fallback
+                                    : Icon(Icons.person, size: 80, color: Colors.grey),
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),

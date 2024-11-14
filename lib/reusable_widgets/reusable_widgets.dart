@@ -16,8 +16,15 @@ Image logoWidget(String imageName) {
 }
 
 /// A reusable text field widget with configurable icon and password visibility.
-TextField reusableTextField(String text, IconData icon, bool isPasswordType,
-    TextEditingController controller, {Color iconColor = Colors.white70, Color fillColor = Colors.blueAccent}) {
+TextField reusableTextField(
+    String text,
+    IconData icon,
+    bool isPasswordType,
+    TextEditingController controller, {
+      Color iconColor = Colors.white70,
+      Color fillColor = Colors.blueAccent,
+      Function(String)? onChanged, // Added onChanged callback
+    }) {
   return TextField(
     controller: controller,
     obscureText: isPasswordType,
@@ -25,6 +32,7 @@ TextField reusableTextField(String text, IconData icon, bool isPasswordType,
     autocorrect: !isPasswordType,
     cursorColor: Colors.white, // Cursor color remains white
     style: TextStyle(color: Colors.white.withOpacity(0.9)),
+    onChanged: onChanged, // Pass the onChanged function to the TextField
     decoration: InputDecoration(
       prefixIcon: Icon(
         icon,

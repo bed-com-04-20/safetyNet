@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../reusable_widgets/reusable_widgets.dart';
 import 'details.dart';
 
 class ReportListScreen extends StatefulWidget {
@@ -12,38 +13,48 @@ class _ReportListScreenState extends State<ReportListScreen> {
   final CollectionReference reportsCollection =
   FirebaseFirestore.instance.collection('missing_person_reports');
   String _searchQuery = "";
-  String _selectedStatusFilter = "approved"; // Default to showing approved reports only
+  String _selectedStatusFilter = "approved";
+  TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFE18888),
+      backgroundColor: Color(0xFF0A0933),
       appBar: AppBar(
-        title: Text('Missing Person Reports'),
+        title: Text(
+          'Missing Person Reports',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Color(0xFF0A0933),
       ),
       body: Column(
         children: [
-          // Search Bar
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              decoration: InputDecoration(
-                labelText: 'Search by name',
-                prefixIcon: Icon(Icons.search),
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+            child: reusableTextField(
+              'Search missing person by name',
+              Icons.search,
+              false,
+              _searchController,
+              iconColor: Colors.white70,
+              fillColor: Colors.blueAccent,
               onChanged: (value) {
                 setState(() {
-                  _searchQuery = value.toLowerCase();
+                  _searchQuery = value;
                 });
               },
             ),
           ),
-          // List of Reports
+          // List of Reports (filtered by search query)
           Expanded(
             child: Container(
               height: MediaQuery.of(context).size.height,
@@ -52,7 +63,7 @@ class _ReportListScreenState extends State<ReportListScreen> {
               ),
               child: StreamBuilder<QuerySnapshot>(
                 stream: reportsCollection
-                    .where('status', isEqualTo: _selectedStatusFilter) // Filter by approved status
+                    .where('status', isEqualTo: _selectedStatusFilter)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
@@ -65,9 +76,11 @@ class _ReportListScreenState extends State<ReportListScreen> {
 
                   if (snapshot.hasData) {
                     final reports = snapshot.data!.docs
-                        .where((doc) => doc['missingPersonName']
-                        .toLowerCase()
-                        .contains(_searchQuery))
+                        .where((doc) {
+                      // Apply filtering for search query
+                      String name = doc['missingPersonName'] ?? '';
+                      return name.toLowerCase().contains(_searchQuery.toLowerCase());
+                    })
                         .toList();
 
                     if (reports.isEmpty) {
