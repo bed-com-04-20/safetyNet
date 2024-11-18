@@ -15,6 +15,7 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
   final FirestoreService _firestoreService = FirestoreService();
   String _selectedStatusFilter = "All";
   final List<String> _statusOptions = ["All", "submitted", "seen", "approved"];
+  String _newStatus = "submitted";
 
   @override
   Widget build(BuildContext context) {
@@ -206,10 +207,26 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
                                 inactiveTrackColor: Colors.grey[300],
                               ),
                               const Text("Visible to users"),
+                              // Status update dropdown for admin
+                              DropdownButton<String>(
+                                value: _newStatus,
+                                onChanged: (newStatus) {
+                                  setState(() {
+                                    _newStatus = newStatus!;
+                                  });
+                                  _updateReportStatus(report.id, _newStatus);
+                                },
+                                items: _statusOptions.map((status) {
+                                  return DropdownMenuItem<String>(
+                                    value: status,
+                                    child: Text(status),
+                                  );
+                                }).toList(),
+                              ),
                             ],
                           ),
                           onTap: () async {
-                            // Update Status Logic
+                            // Future implementation for tapping on a report if needed
                           },
                         ),
                       );
@@ -222,5 +239,24 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
         ),
       ),
     );
+  }
+
+  // Update report status in Firestore
+  Future<void> _updateReportStatus(String reportId, String newStatus) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('missing_person_reports')
+          .doc(reportId)
+          .update({
+        'status': newStatus,
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Status updated to $newStatus')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update status: $e')),
+      );
+    }
   }
 }

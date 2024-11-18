@@ -22,7 +22,7 @@ class _AppRouterState extends State<AppRouter> {
   // Listen for unread notifications from Firebase
   void _listenForUnreadNotifications() {
     FirebaseDatabase.instance
-        .ref('notifications/user1') // Assuming user1 is the logged-in user
+        .ref('notifications/user1')
         .onValue
         .listen((event) {
       final data = event.snapshot.value as Map<dynamic, dynamic>?;
@@ -44,7 +44,7 @@ class _AppRouterState extends State<AppRouter> {
   @override
   void initState() {
     super.initState();
-    _listenForUnreadNotifications(); // Start listening for notifications
+    _listenForUnreadNotifications();
   }
 
   void onTabTapped(int index) {
@@ -74,7 +74,7 @@ class _AppRouterState extends State<AppRouter> {
                     color: Color(0xFF0A0933),
                     blurRadius: 10,
                     spreadRadius: 1,
-                    offset: Offset(0, 4), // Shadow position
+                    offset: Offset(0, 4),
                   ),
                 ],
               ),
