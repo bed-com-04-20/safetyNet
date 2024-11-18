@@ -98,6 +98,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
       appBar: AppBar(
         title: Text('Conversation with ${widget.name}'),
         backgroundColor: const Color(0xFF0A0933),
+        foregroundColor: Colors.white,
       ),
       backgroundColor: const Color(0xFF0A0933),
       body: Column(
