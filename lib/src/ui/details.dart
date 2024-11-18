@@ -9,6 +9,7 @@ class DetailScreen extends StatelessWidget {
   final String location;
   final String details;
   final String imageUrl;
+  final String reportId; // Add a unique identifier for the report
 
   DetailScreen({
     required this.name,
@@ -16,6 +17,7 @@ class DetailScreen extends StatelessWidget {
     required this.location,
     required this.details,
     required this.imageUrl,
+    required this.reportId, // Accept the unique identifier in the constructor
   });
 
   @override
@@ -34,12 +36,12 @@ class DetailScreen extends StatelessWidget {
               if (imageUrl.isNotEmpty)
                 ClipRRect(
                   borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(32.0), // Increased curve
-                    bottomRight: Radius.circular(32.0), // Increased curve
+                    bottomLeft: Radius.circular(32.0),
+                    bottomRight: Radius.circular(32.0),
                   ),
                   child: CachedNetworkImage(
                     imageUrl: imageUrl,
-                    height: 400, // Increased height
+                    height: 400,
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),
@@ -51,12 +53,12 @@ class DetailScreen extends StatelessWidget {
                     bottomRight: Radius.circular(32.0),
                   ),
                   child: Container(
-                    height: 300, // Increased height
+                    height: 300,
                     width: double.infinity,
                     color: Colors.grey[300],
                     child: Icon(
                       Icons.person,
-                      size: 120, // Increased icon size
+                      size: 120,
                       color: Colors.white,
                     ),
                   ),
@@ -68,7 +70,7 @@ class DetailScreen extends StatelessWidget {
                   'Name: $name',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 22, // Slightly larger font
+                    fontSize: 22,
                     color: Colors.white,
                   ),
                 ),
@@ -98,7 +100,6 @@ class DetailScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 16.0),
-
               Center(
                 child: reusableButton(
                   context,
@@ -107,7 +108,10 @@ class DetailScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ConversationScreen(),
+                        builder: (context) => ConversationScreen(
+                          name: name, // Pass the person's name
+                          reportId: reportId, // Pass the report ID for specific targeting
+                        ),
                       ),
                     );
                   },

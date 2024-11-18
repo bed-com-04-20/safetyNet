@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:safetynet/src/ui/report_list_screen.dart';
+import 'package:firebase_database/firebase_database.dart';
 import '../ui/home.dart';
 import '../ui/report_form_screen.dart';
+import '../ui/notifications.dart';
 
 class AppRouter extends StatefulWidget {
   @override
@@ -10,12 +11,41 @@ class AppRouter extends StatefulWidget {
 
 class _AppRouterState extends State<AppRouter> {
   int _currentIndex = 0;
+  int _unreadNotificationCount = 0;
 
   final List<Widget> _pages = [
     HomePage(),
     ReportFormScreen(),
-    ReportListScreen(),
+    NotificationsScreen(),
   ];
+
+  // Listen for unread notifications from Firebase
+  void _listenForUnreadNotifications() {
+    FirebaseDatabase.instance
+        .ref('notifications/user1') // Assuming user1 is the logged-in user
+        .onValue
+        .listen((event) {
+      final data = event.snapshot.value as Map<dynamic, dynamic>?;
+      if (data != null) {
+        int unreadCount = 0;
+        data.forEach((key, value) {
+          if (value['read'] == false) {
+            unreadCount++;
+          }
+        });
+
+        setState(() {
+          _unreadNotificationCount = unreadCount;
+        });
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _listenForUnreadNotifications(); // Start listening for notifications
+  }
 
   void onTabTapped(int index) {
     setState(() {
@@ -48,7 +78,6 @@ class _AppRouterState extends State<AppRouter> {
                   ),
                 ],
               ),
-
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(50),
                 child: BottomNavigationBar(
@@ -62,15 +91,41 @@ class _AppRouterState extends State<AppRouter> {
                       icon: Icon(Icons.home),
                       label: 'Home',
                     ),
-
                     BottomNavigationBarItem(
                       icon: Icon(Icons.person),
                       label: 'Report missing person',
                     ),
-
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.list),
-                      label: 'Missing persons',
+                      icon: Stack(
+                        children: [
+                          Icon(Icons.notification_add),
+                          if (_unreadNotificationCount > 0)
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Container(
+                                padding: EdgeInsets.all(2),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                constraints: BoxConstraints(
+                                  minWidth: 16,
+                                  minHeight: 16,
+                                ),
+                                child: Text(
+                                  '$_unreadNotificationCount',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      label: 'Notifications',
                     ),
                   ],
                 ),

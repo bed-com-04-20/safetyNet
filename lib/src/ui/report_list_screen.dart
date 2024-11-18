@@ -54,7 +54,6 @@ class _ReportListScreenState extends State<ReportListScreen> {
               },
             ),
           ),
-          // List of Reports (filtered by search query)
           Expanded(
             child: Container(
               height: MediaQuery.of(context).size.height,
@@ -67,7 +66,7 @@ class _ReportListScreenState extends State<ReportListScreen> {
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
-                    return Center(child: Text('Error fetching reports'));
+                    return Center(child: Text('Error fetching reports', style: TextStyle(color: Colors.white)));
                   }
 
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -77,20 +76,25 @@ class _ReportListScreenState extends State<ReportListScreen> {
                   if (snapshot.hasData) {
                     final reports = snapshot.data!.docs
                         .where((doc) {
-                      // Apply filtering for search query
                       String name = doc['missingPersonName'] ?? '';
                       return name.toLowerCase().contains(_searchQuery.toLowerCase());
                     })
                         .toList();
 
                     if (reports.isEmpty) {
-                      return Center(child: Text('No matching reports found'));
+                      return Center(
+                        child: Text(
+                          'No matching reports found',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      );
                     }
 
                     return ListView.builder(
                       itemCount: reports.length,
                       itemBuilder: (context, index) {
                         var doc = reports[index];
+                        String reportId = doc.id; // Unique identifier for the report
                         String name = doc['missingPersonName'] ?? 'Unknown';
                         String lastSeen = doc['lastSeen'] ?? 'Unknown';
                         String location = doc['location'] ?? 'Unknown';
@@ -110,6 +114,7 @@ class _ReportListScreenState extends State<ReportListScreen> {
                                     location: location,
                                     details: details,
                                     imageUrl: imageUrl,
+                                    reportId: reportId, // Pass the unique identifier
                                   ),
                                 ),
                               );
@@ -203,7 +208,12 @@ class _ReportListScreenState extends State<ReportListScreen> {
                     );
                   }
 
-                  return Center(child: Text('No reports found'));
+                  return Center(
+                    child: Text(
+                      'No reports found',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
                 },
               ),
             ),

@@ -3,6 +3,8 @@ import '../models/report_model.dart';
 import '../models/crime_report_model.dart';
 
 class FirestoreService {
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+
   // Collection for missing person reports
   final CollectionReference reportsCollection = FirebaseFirestore.instance.collection('missing_person_reports');
 
@@ -19,9 +21,17 @@ class FirestoreService {
   }
 
   // Fetch missing person reports from Firestore
-  Future<List<ReportModel>> fetchReports() async {
+  Future<List<ReportModel>> fetchReports(String status) async {
     try {
-      QuerySnapshot snapshot = await reportsCollection.get();
+      QuerySnapshot snapshot;
+
+      // If status is 'All', fetch all reports
+      if (status == 'All') {
+        snapshot = await reportsCollection.get();
+      } else {
+        snapshot = await reportsCollection.where('status', isEqualTo: status).get();
+      }
+
       return snapshot.docs.map((doc) {
         return ReportModel(
           missingPersonName: doc['missingPersonName'],
@@ -30,7 +40,7 @@ class FirestoreService {
           lastSeen: doc['lastSeen'],
           location: doc['location'],
           details: doc['details'],
-          imageUrl: doc['imageUrl'], // Include imageUrl if it’s in your ReportModel
+          imageUrl: doc['imageUrl'],
           timestamp: DateTime.parse(doc['timestamp']),
         );
       }).toList();
@@ -93,6 +103,26 @@ class FirestoreService {
       }).toList();
     } catch (error) {
       throw Exception("Error fetching crime reports: $error");
+    }
+  }
+
+  // Reply to a missing person report (admin replies)
+  Future<void> replyToMessage(String reportId, String senderId, String replyText) async {
+    var reportRef = reportsCollection.doc(reportId);
+
+    try {
+      await reportRef.update({
+        'messages': FieldValue.arrayUnion([
+          {
+            'text': replyText,
+            'senderId': senderId, // Use the Admin's ID or hardcode 'Admin'
+            'timestamp': FieldValue.serverTimestamp(),
+            'isReplied': true, // Mark as replied
+          },
+        ]),
+      });
+    } catch (error) {
+      throw Exception("Error replying to message: $error");
     }
   }
 }

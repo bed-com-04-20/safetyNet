@@ -5,6 +5,14 @@ import 'package:firebase_database/firebase_database.dart';
 import 'dart:io';
 
 class ConversationScreen extends StatefulWidget {
+  final String name;
+  final String reportId;
+
+  const ConversationScreen({
+    required this.name,
+    required this.reportId,
+  });
+
   @override
   _ConversationScreenState createState() => _ConversationScreenState();
 }
@@ -16,7 +24,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   File? _imageFile;
 
   Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     setState(() {
       if (pickedFile != null) {
         _imageFile = File(pickedFile.path);
@@ -32,7 +40,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
         Reference ref = storage.ref().child('uploads/$fileName');
         await ref.putFile(_imageFile!);
         String downloadURL = await ref.getDownloadURL();
-        // Update the message with the image URL
         await _database.child('messages').child(messageId).update({
           'imageUrl': downloadURL,
         });
@@ -43,15 +50,20 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 
   void _sendMessage(String sender) async {
-    String message = _messageController.text;
+    String message = _messageController.text.trim();
     if (message.isNotEmpty || _imageFile != null) {
-      // Create a new message entry in Realtime Database
-      DatabaseReference newMessageRef = _database.child('messages').push();
+      DatabaseReference newMessageRef =
+      _database.child('messages/${widget.reportId}').push();
+      String messageId = newMessageRef.key!;
+
       await newMessageRef.set({
         'text': message,
         'sender': sender,
-        'timestamp': DateTime.now().millisecondsSinceEpoch,
+        'timestamp': DateTime
+            .now()
+            .millisecondsSinceEpoch,
         'imageUrl': null,
+        'hasUnreadMessages': sender == 'user',
       });
 
       if (_imageFile != null) {
@@ -62,42 +74,110 @@ class _ConversationScreenState extends State<ConversationScreen> {
       }
 
       _messageController.clear();
-    } else {
-      print('Please type a message or take a photo.');
+
+      // Mark all messages as read
+      if (sender == 'admin') {
+        _database.child('messages/${widget.reportId}').once().then((snapshot) {
+          Map<dynamic, dynamic>? messages = snapshot.snapshot.value as Map<
+              dynamic,
+              dynamic>?;
+          if (messages != null) {
+            messages.forEach((key, value) {
+              _database.child('messages/${widget.reportId}/$key').update(
+                  {'hasUnreadMessages': false});
+            });
+          }
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Conversation')),
+      appBar: AppBar(
+        title: Text('Conversation with ${widget.name}'),
+        backgroundColor: const Color(0xFF0A0933),
+      ),
+      backgroundColor: const Color(0xFF0A0933),
       body: Column(
         children: [
           Expanded(
             child: StreamBuilder(
-              stream: _database.child('messages').orderByChild('timestamp').onValue,
+              stream: _database
+                  .child('messages/${widget.reportId}')
+                  .orderByChild('timestamp')
+                  .onValue,
               builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
                 if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 }
 
-                Map<dynamic, dynamic> messages = (snapshot.data!.snapshot.value as Map<dynamic, dynamic>);
+                Map<dynamic, dynamic> messages =
+                    (snapshot.data!.snapshot.value as Map<dynamic, dynamic>?) ??
+                        {};
                 List<Map<dynamic, dynamic>> messageList = messages.entries
                     .map((entry) => entry.value as Map<dynamic, dynamic>)
-                    .toList();
+                    .toList()
+                  ..sort((a, b) => a['timestamp'].compareTo(b['timestamp']));
 
                 return ListView.builder(
                   itemCount: messageList.length,
                   itemBuilder: (context, index) {
                     var message = messageList[index];
                     bool isAdmin = message['sender'] == 'admin';
-                    return ListTile(
-                      title: Text(message['text'] ?? ''),
-                      subtitle: message['imageUrl'] != null
-                          ? Image.network(message['imageUrl'])
-                          : null,
-                      trailing: isAdmin ? Icon(Icons.admin_panel_settings) : null,
-                      leading: isAdmin ? null : Icon(Icons.person),
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4.0, horizontal: 8.0),
+                      child: Align(
+                        alignment: isAdmin ? Alignment.centerRight : Alignment
+                            .centerLeft,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: isAdmin
+                                ? Colors.green.withOpacity(
+                                0.3) // Green for Admin
+                                : Colors.blueAccent.withOpacity(0.3),
+                            // Blue for User
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: isAdmin
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
+                            children: [
+                              if (message['text'] != null &&
+                                  message['text'].isNotEmpty)
+                                Text(
+                                  message['text'],
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 16.0),
+                                ),
+                              if (message['imageUrl'] != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Image.network(
+                                    message['imageUrl'],
+                                    height: 150,
+                                    width: 150,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder: (context, child, progress) {
+                                      return progress == null
+                                          ? child
+                                          : const Center(
+                                          child: CircularProgressIndicator());
+                                    },
+                                    errorBuilder: (context, error,
+                                        stackTrace) =>
+                                    const Icon(Icons.error, color: Colors.red),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
                     );
                   },
                 );
@@ -108,21 +188,26 @@ class _ConversationScreenState extends State<ConversationScreen> {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
+                IconButton(
+                  icon: const Icon(Icons.camera_alt, color: Colors.white),
+                  onPressed: _pickImage,
+                ),
                 Expanded(
                   child: TextField(
                     controller: _messageController,
-                    decoration: InputDecoration(
-                      labelText: 'Type your message...',
+                    decoration: const InputDecoration(
+                      hintText: 'Type your message...',
+                      hintStyle: TextStyle(color: Colors.white70),
                       border: OutlineInputBorder(),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white70),
+                      ),
                     ),
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.camera_alt),
-                  onPressed: _pickImage,
-                ),
-                IconButton(
-                  icon: Icon(Icons.send),
+                  icon: const Icon(Icons.send, color: Colors.white),
                   onPressed: () => _sendMessage('user'),
                 ),
               ],

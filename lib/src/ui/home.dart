@@ -17,7 +17,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       width: double.infinity,
       height: MediaQuery.of(context).size.height,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Color(0xFF0A0933),
       ),
       child: SingleChildScrollView(
@@ -59,9 +59,9 @@ class _HomePageState extends State<HomePage> {
       },
       style: OutlinedButton.styleFrom(
         foregroundColor: Colors.white,
-        backgroundColor: _selectedIndex == index ? Color(0xFFeb6958) : Colors.transparent,
-        side: BorderSide(color: Color(0xFFeb6958), width: 2.0),
-        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+        backgroundColor: _selectedIndex == index ? const Color(0xFFeb6958) : Colors.transparent,
+        side: const BorderSide(color: Color(0xFFeb6958), width: 2.0),
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
       ),
       child: Text(text),
     );
@@ -71,14 +71,14 @@ class _HomePageState extends State<HomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
             'Missing Persons',
             style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: SizedBox(
@@ -91,10 +91,10 @@ class _HomePageState extends State<HomePage> {
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 }
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Center(child: Text("No missing persons found", style: TextStyle(color: Colors.white)));
+                  return const Center(child: Text("No missing persons found", style: TextStyle(color: Colors.white)));
                 }
 
                 final reports = snapshot.data!.docs;
@@ -126,15 +126,15 @@ class _HomePageState extends State<HomePage> {
                                   imageUrl,
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) =>
-                                      Icon(Icons.person, size: 80, color: Colors.grey),
+                                      const Icon(Icons.person, size: 80, color: Colors.grey),
                                 )
-                                    : Icon(Icons.person, size: 80, color: Colors.grey),
+                                    : const Icon(Icons.person, size: 80, color: Colors.grey),
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
                                   name,
-                                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                                   textAlign: TextAlign.center,
                                 ),
                               ),

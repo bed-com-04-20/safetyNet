@@ -4,7 +4,8 @@ import 'package:safetynet/src/routing/router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:safetynet/src/ui/signUp.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'admins_approval.dart';
+
+import 'Admin/admins_approval.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
