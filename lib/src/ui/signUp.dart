@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart'; // Import the Firebase Database package
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:safetynet/reusable_widgets/reusable_widgets.dart';
-import 'package:safetynet/utils/colors_utils.dart'; // Import Firebase Authentication
+import 'package:safetynet/utils/colors_utils.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -15,9 +15,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Create a reference to the database
   final DatabaseReference _database = FirebaseDatabase.instance.ref();
-  final FirebaseAuth _auth = FirebaseAuth.instance; // Firebase Auth instance
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   bool showSpinner = false;
 
@@ -47,13 +46,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
             'email': email,
           });
 
-          print('User registered: $username');
-
           // Navigate to the login screen or homepage
           Navigator.pushNamed(context, 'login_screen');
         }
       } catch (e) {
-        print('Error: $e');
+        // Display error message to the user
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
       }
 
       setState(() {
@@ -72,8 +72,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).size.height * 0.2, 20, 0),
-          child: Form( // Add the Form widget here
-            key: _formKey, // Link the _formKey to the Form
+          child: Form(
+            key: _formKey,
             child: Column(
               children: <Widget>[
                 logoWidget("assets/images/logo.png"),
@@ -84,6 +84,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Icons.person_outline,
                   false,
                   _usernameController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Username is required';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: 30),
 
@@ -92,6 +98,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Icons.email_outlined,
                   false,
                   _emailController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Email is required';
+                    }
+                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                      return 'Enter a valid email';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: 30),
 
@@ -100,6 +115,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Icons.lock_outline,
                   true,
                   _passwordController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Password is required';
+                    }
+                    if (value.length < 6) {
+                      return 'Password must be at least 8 characters long';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: 30),
 
@@ -109,6 +133,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   _register, // Calls the _register function when pressed
                 ),
                 SizedBox(height: 20),
+
+                // Show loading spinner if showSpinner is true
+                if (showSpinner)
+                  Center(child: CircularProgressIndicator()),
               ],
             ),
           ),
