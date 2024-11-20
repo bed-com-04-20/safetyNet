@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:safetynet/reusable_widgets/reusable_widgets.dart';
+import 'package:safetynet/src/ui/signIn.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -20,48 +21,74 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool showSpinner = false;
 
   void _register() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        showSpinner = true;
-      });
+    String username = _usernameController.text.trim();
+    String email = _emailController.text.trim();
+    String password = _passwordController.text.trim();
 
-      String username = _usernameController.text.trim();
-      String email = _emailController.text.trim();
-      String password = _passwordController.text.trim();
+    // Validation logic
+    if (username.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Username is required')),
+      );
+      return;
+    }
 
-      try {
-        UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+    if (email.isEmpty || !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Enter a valid email')),
+      );
+      return;
+    }
 
-        User? user = userCredential.user;
+    if (password.isEmpty || password.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Password must be at least 6 characters long')),
+      );
+      return;
+    }
 
-        if (user != null) {
-          print('User created with UID: ${user.uid}');
+    setState(() {
+      showSpinner = true;
+    });
 
-          await _database.child('users').child(user.uid).set({
-            'username': username,
-            'email': email,
-          });
+    try {
+      // Create user with Firebase Auth
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-          print('User data stored in database for UID: ${user.uid}');
+      User? user = userCredential.user;
 
-          // Navigate to the login screen
-          Navigator.pushNamed(context, 'login_screen');
-        } else {
-          print('User is null, could not register.');
-        }
-      } catch (e) {
-        print('Error: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration failed: $e')),
-        );
-      } finally {
-        setState(() {
-          showSpinner = false;
+      if (user != null) {
+        print('User created with UID: ${user.uid}');
+
+        // Save user details to Firebase Realtime Database
+        await _database.child('users').child(user.uid).set({
+          'username': username,
+          'email': email,
+          'role': 'user', // Default role for all new users
         });
+
+        print('User data stored in database for UID: ${user.uid}');
+
+        // Navigate to the SignInPage
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => SignInPage()),
+        );
+      } else {
+        print('User is null, could not register.');
       }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Registration failed: $e')),
+      );
+    } finally {
+      setState(() {
+        showSpinner = false;
+      });
     }
   }
 
@@ -70,7 +97,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Color(0xFF0A0933),
         ),
         child: SingleChildScrollView(
@@ -79,9 +106,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
             key: _formKey,
             child: Column(
               children: <Widget>[
+                // App Logo
                 logoWidget("assets/logo.png"),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
 
+                // Username Field
                 reusableTextField(
                   'Enter your username',
                   Icons.person_outline,
@@ -94,8 +123,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     return null;
                   },
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
 
+                // Email Field
                 reusableTextField(
                   'Enter your email',
                   Icons.email_outlined,
@@ -111,8 +141,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     return null;
                   },
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
 
+                // Password Field
                 reusableTextField(
                   'Enter your password',
                   Icons.lock_outline,
@@ -128,12 +159,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     return null;
                   },
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
 
-                // Use the reusableButton for "SIGN UP"
-                reusableButton(context, 'SIGN UP', _register),
+                // Sign-Up Button
+                reusableButton(
+                  context,
+                  'SIGN UP',
+                  _register,
+                ),
 
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
+
+                // Navigate to Sign-In Option
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Already have an account?",
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => SignInPage()),
+                        );
+                      },
+                      child: const Text(
+                        " Sign In",
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),

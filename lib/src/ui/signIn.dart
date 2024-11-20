@@ -24,7 +24,7 @@ class _SignInPageState extends State<SignInPage> {
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Color(0xFF0A0933),
         ),
         child: SingleChildScrollView(
@@ -33,13 +33,22 @@ class _SignInPageState extends State<SignInPage> {
             child: Column(
               children: <Widget>[
                 logoWidget("assets/logo.png"),
-                SizedBox(height: 30),
-                reusableTextField("Enter Email", Icons.email_outlined, false, _emailTextController, validator: (value) {  }),
-                SizedBox(height: 30),
-                reusableTextField("Enter Password", Icons.lock_outline, true, _passwordTextController, validator: (value) {  }),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
+                reusableTextField(
+                  "Enter Email",
+                  Icons.email_outlined,
+                  false,
+                  _emailTextController,
+                ),
+                const SizedBox(height: 30),
+                reusableTextField(
+                  "Enter Password",
+                  Icons.lock_outline,
+                  true,
+                  _passwordTextController,
+                ),
+                const SizedBox(height: 30),
 
-                // Sign-In Button with Role Check
                 reusableButton(context, 'SIGN IN', () async {
                   try {
                     final userCredential = await _auth.signInWithEmailAndPassword(
@@ -48,40 +57,41 @@ class _SignInPageState extends State<SignInPage> {
                     );
 
                     if (userCredential.user != null) {
-                      // Access the Realtime Database and check the user's role
+                      // Access Realtime Database for role
                       final DatabaseReference userRef = FirebaseDatabase.instance
                           .ref()
                           .child('users')
                           .child(userCredential.user!.uid);
 
-                      userRef.once().then((DatabaseEvent event) {
-                        final snapshot = event.snapshot;
-                        if (snapshot.exists) {
-                          final data = snapshot.value as Map<dynamic, dynamic>?;
-                          final role = data?['role'];
-                          print("User role fetched from Realtime Database: $role");
+                      final DatabaseEvent event = await userRef.once();
+                      final snapshot = event.snapshot;
 
-                          if (role == 'admin') {
-                            // Navigate to ImageManagementPage if user is an admin
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => AdminReportScreen()),
-                            );
-                          } else {
-                            // Navigate to a regular user page if not an admin
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => AppRouter()),
-                            );
-                          }
+                      if (snapshot.exists) {
+                        final data = snapshot.value as Map<dynamic, dynamic>;
+                        final role = data['role'];
+
+                        if (role == 'admin') {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => AdminReportScreen()),
+                          );
                         } else {
-                          print("User document does not exist in Realtime Database.");
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => AppRouter()),
+                          );
                         }
-                      });
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("User role not found in the database."),
+                          ),
+                        );
+                      }
                     }
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Sign-In failed: ${e.toString()}")),
+                      SnackBar(content: Text("Sign-In failed: $e")),
                     );
                   }
                 }),
