@@ -32,9 +32,11 @@ class _ReportListScreenState extends State<ReportListScreen> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
+
           ),
         ),
         backgroundColor: Color(0xFF0A0933),
+        foregroundColor: Colors.white,
       ),
       body: Column(
         children: [
