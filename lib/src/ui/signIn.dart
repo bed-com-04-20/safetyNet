@@ -4,7 +4,6 @@ import 'package:safetynet/src/routing/router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:safetynet/src/ui/signUp.dart';
 import 'package:firebase_database/firebase_database.dart';
-
 import 'Admin/admins_approval.dart';
 
 class SignInPage extends StatefulWidget {
@@ -39,6 +38,15 @@ class _SignInPageState extends State<SignInPage> {
                   Icons.email_outlined,
                   false,
                   _emailTextController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Email cannot be empty";
+                    }
+                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                      return "Enter a valid email";
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 30),
                 reusableTextField(
@@ -46,6 +54,15 @@ class _SignInPageState extends State<SignInPage> {
                   Icons.lock_outline,
                   true,
                   _passwordTextController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Password cannot be empty";
+                    }
+                    if (value.length < 6) {
+                      return "Password must be at least 6 characters";
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 30),
 
