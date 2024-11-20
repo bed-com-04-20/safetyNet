@@ -51,7 +51,7 @@ class _ReportListScreenState extends State<ReportListScreen> {
                 setState(() {
                   _searchQuery = value;
                 });
-              },
+              }, validator: (value) {  },
             ),
           ),
           Expanded(

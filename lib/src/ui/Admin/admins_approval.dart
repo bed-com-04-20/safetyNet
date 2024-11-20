@@ -133,7 +133,7 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              // Report List
+              // Report List filtered by approved status
               StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('missing_person_reports')
@@ -175,9 +175,39 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                'Status: ${reportData['status'] ?? 'N/A'}',
-                                style: const TextStyle(color: Colors.white70),
+                              GestureDetector(
+                                onTap: () async {
+                                  String? selectedStatus = await showDialog<String>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('Select Status'),
+                                        content: SingleChildScrollView(
+                                          child: Column(
+                                            children: _statusOptions.map((status) {
+                                              return ListTile(
+                                                title: Text(status),
+                                                onTap: () {
+                                                  Navigator.pop(context, status);
+                                                },
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                  if (selectedStatus != null) {
+                                    _updateReportStatus(report.id, selectedStatus);
+                                  }
+                                },
+                                child: Text(
+                                  'Status: ${reportData['status'] ?? 'N/A'}',
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                               Text(
                                 'Details: ${reportData['details'] ?? 'No details available'}',
@@ -208,21 +238,6 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
                               ),
                               const Text("Visible to users"),
                               // Status update dropdown for admin
-                              DropdownButton<String>(
-                                value: _newStatus,
-                                onChanged: (newStatus) {
-                                  setState(() {
-                                    _newStatus = newStatus!;
-                                  });
-                                  _updateReportStatus(report.id, _newStatus);
-                                },
-                                items: _statusOptions.map((status) {
-                                  return DropdownMenuItem<String>(
-                                    value: status,
-                                    child: Text(status),
-                                  );
-                                }).toList(),
-                              ),
                             ],
                           ),
                           onTap: () async {

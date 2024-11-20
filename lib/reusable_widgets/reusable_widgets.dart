@@ -23,7 +23,7 @@ TextField reusableTextField(
     TextEditingController controller, {
       Color iconColor = Colors.white70,
       Color fillColor = Colors.blueAccent,
-      Function(String)? onChanged, // Added onChanged callback
+      Function(String)? onChanged, required String? Function(dynamic value) validator, // Added onChanged callback
     }) {
   return TextField(
     controller: controller,

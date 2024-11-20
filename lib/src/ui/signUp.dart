@@ -87,6 +87,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Icons.person_outline,
                   false,
                   _usernameController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Username is required';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: 30),
 
@@ -95,6 +101,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Icons.email_outlined,
                   false,
                   _emailController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Email is required';
+                    }
+                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                      return 'Enter a valid email';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: 30),
 
@@ -103,6 +118,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Icons.lock_outline,
                   true,
                   _passwordController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Password is required';
+                    }
+                    if (value.length < 6) {
+                      return 'Password must be at least 8 characters long';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: 30),
 

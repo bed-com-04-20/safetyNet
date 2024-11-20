@@ -34,9 +34,9 @@ class _SignInPageState extends State<SignInPage> {
               children: <Widget>[
                 logoWidget("assets/logo.png"),
                 SizedBox(height: 30),
-                reusableTextField("Enter Email", Icons.email_outlined, false, _emailTextController),
+                reusableTextField("Enter Email", Icons.email_outlined, false, _emailTextController, validator: (value) {  }),
                 SizedBox(height: 30),
-                reusableTextField("Enter Password", Icons.lock_outline, true, _passwordTextController),
+                reusableTextField("Enter Password", Icons.lock_outline, true, _passwordTextController, validator: (value) {  }),
                 SizedBox(height: 30),
 
                 // Sign-In Button with Role Check
