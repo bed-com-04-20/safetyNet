@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:safetynet/src/ui/report_list_screen.dart';
 import 'package:safetynet/src/ui/signIn.dart';
 
@@ -19,8 +20,12 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: const Color(0xFF0A0933),
       appBar: AppBar(
         title: const Text(
-          'Home',
-          style: TextStyle(color: Colors.white),
+          'SafetyNet',
+          style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
 
@@ -30,36 +35,63 @@ class _HomePageState extends State<HomePage> {
         ],
 
         leading: IconButton(onPressed: () {},
-            icon: const Icon(Icons.help_outlined)),
-        backgroundColor: const Color(0xFF0A0933),
+            icon: const Icon(Icons.notification_add)),
+        backgroundColor: const Color(0xFFeb6958),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
+
       body: Builder(
         builder: (context) {
-          return Center(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).size.height * 0.01, 20, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          return SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(height: 40),
+                const Text(
+                  'Empowering communities to take action',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.normal,
+                  ),
+                )
+                    .animate()
+                    .fade(duration: 2000.ms)
+                    .slideY(),
+
+                SizedBox(height: 40),
+
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    20,
+                    MediaQuery.of(context).size.height * 0.01,
+                    20,
+                    0,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      buildOutlinedButton(0, 'All'),
-                      buildOutlinedButton(1, 'Crimes'),
-                      buildOutlinedButton(2, 'Missing persons'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          buildOutlinedButton(0, 'All'),
+                          buildOutlinedButton(1, 'Crimes'),
+                          buildOutlinedButton(2, 'Missing persons'),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                      buildMissingPersonsSection(),
+                      SizedBox(height: 20),
+                      buildMissingPersonsSection(),
                     ],
                   ),
-                  SizedBox(height: 20),
-                  buildMissingPersonsSection(),
-                  SizedBox(height: 20),
-                  buildMissingPersonsSection(),
-                ],
-              ),
+                ),
+              ], // Closing the 'children' list here
             ),
           );
         },
       ),
+
     );
   }
 
