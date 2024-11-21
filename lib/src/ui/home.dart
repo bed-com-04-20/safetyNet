@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:safetynet/src/ui/report_list_screen.dart';
+import 'package:safetynet/src/ui/crime_report_form_screen.dart';
+import 'package:safetynet/src/ui/crime_report_list_screen.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -56,6 +59,12 @@ class _HomePageState extends State<HomePage> {
             MaterialPageRoute(builder: (context) => ReportListScreen()),
           );
         }
+        if(text == 'Crimes'){
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CrimeReportListScreen()),
+          );
+        }
       },
       style: OutlinedButton.styleFrom(
         foregroundColor: Colors.white,
@@ -66,6 +75,8 @@ class _HomePageState extends State<HomePage> {
       child: Text(text),
     );
   }
+
+
 
   Widget buildMissingPersonsSection() {
     return Column(

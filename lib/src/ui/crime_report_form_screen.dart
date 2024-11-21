@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../../models/crime_report_model.dart';
 import '../../services/firestore_service.dart';
+import '../../reusable_widgets/reusable_widgets.dart';
 
 class CrimeReportFormScreen extends StatefulWidget {
   const CrimeReportFormScreen({super.key});
@@ -23,6 +24,11 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
   String street = '';
   String city = '';
   String crimeDetails = '';
+
+  // Focus nodes for managing field navigation
+  final FocusNode _streetFocusNode = FocusNode();
+  final FocusNode _cityFocusNode = FocusNode();
+  final FocusNode _detailsFocusNode = FocusNode();
 
   // Pick an image from the gallery
   Future<void> _pickImage() async {
@@ -91,9 +97,19 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
   }
 
   @override
+  void dispose() {
+    // Dispose focus nodes to avoid memory leaks
+    _streetFocusNode.dispose();
+    _cityFocusNode.dispose();
+    _detailsFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Crime Report')),
+      backgroundColor: Color(0xFF0A0933),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -101,7 +117,18 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
           child: ListView(
             children: [
               TextFormField(
-                decoration: InputDecoration(labelText: 'Street'),
+                focusNode: _streetFocusNode,
+                textInputAction: TextInputAction.next,
+                onFieldSubmitted: (_) {
+                  FocusScope.of(context).requestFocus(_cityFocusNode);
+                },
+                decoration: InputDecoration(
+                  labelText: 'Street',
+                  labelStyle: TextStyle(
+                      fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
+                  hintText: 'Enter the street name',
+                  hintStyle: TextStyle(color: Colors.white),
+                ),
                 validator: (value) => value!.isEmpty ? 'Please enter a street' : null,
                 onSaved: (value) {
                   street = value!;
@@ -109,7 +136,18 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
               ),
               SizedBox(height: 16.0),
               TextFormField(
-                decoration: InputDecoration(labelText: 'City'),
+                focusNode: _cityFocusNode,
+                textInputAction: TextInputAction.next,
+                onFieldSubmitted: (_) {
+                  FocusScope.of(context).requestFocus(_detailsFocusNode);
+                },
+                decoration: InputDecoration(
+                  labelText: 'City',
+                  labelStyle: TextStyle(
+                      fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
+                  hintText: 'Enter the city name',
+                  hintStyle: TextStyle(color: Colors.white),
+                ),
                 validator: (value) => value!.isEmpty ? 'Please enter a city' : null,
                 onSaved: (value) {
                   city = value!;
@@ -117,7 +155,15 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
               ),
               SizedBox(height: 16.0),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Crime Details'),
+                focusNode: _detailsFocusNode,
+                textInputAction: TextInputAction.done,
+                decoration: InputDecoration(
+                  labelText: 'Crime Details',
+                  labelStyle: TextStyle(
+                      fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
+                  hintText: 'Enter the details',
+                  hintStyle: TextStyle(color: Colors.white),
+                ),
                 maxLines: 4,
                 validator: (value) => value!.isEmpty ? 'Please enter crime details' : null,
                 onSaved: (value) {
@@ -138,11 +184,6 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
                     height: 200,
                   ),
                 ),
-
-
-
-
-
               SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: submitCrimeReport,
