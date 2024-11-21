@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:safetynet/src/ui/report_list_screen.dart';
+import 'package:safetynet/src/ui/signIn.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,31 +15,50 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: MediaQuery.of(context).size.height,
-      decoration: const BoxDecoration(
-        color: Color(0xFF0A0933),
-      ),
-      child: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).size.height * 0.2, 20, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                buildOutlinedButton(0, 'All'),
-                buildOutlinedButton(1, 'Crimes'),
-                buildOutlinedButton(2, 'Missing persons'),
-              ],
-            ),
-            SizedBox(height: 20),
-            buildMissingPersonsSection(),
-            SizedBox(height: 20),
-            buildMissingPersonsSection(),
-          ],
+    return Scaffold(
+      backgroundColor: const Color(0xFF0A0933),
+      appBar: AppBar(
+        title: const Text(
+          'Home',
+          style: TextStyle(color: Colors.white),
         ),
+        centerTitle: true,
+
+        actions: <Widget>[
+          IconButton(onPressed: () {},
+              icon: const Icon(Icons.logout_outlined))
+        ],
+
+        leading: IconButton(onPressed: () {},
+            icon: const Icon(Icons.help_outlined)),
+        backgroundColor: const Color(0xFF0A0933),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Builder(
+        builder: (context) {
+          return Center(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).size.height * 0.01, 20, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      buildOutlinedButton(0, 'All'),
+                      buildOutlinedButton(1, 'Crimes'),
+                      buildOutlinedButton(2, 'Missing persons'),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  buildMissingPersonsSection(),
+                  SizedBox(height: 20),
+                  buildMissingPersonsSection(),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -142,6 +162,13 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
+                      // GestureDetector(
+                      //   onTap: () {
+                      //     Navigator.pushReplacement(
+                      //         context,
+                      //         MaterialPageRoute(builder: (context) => SignInPage()),
+                      //   },
+                      // ),
                     );
                   },
                 );
