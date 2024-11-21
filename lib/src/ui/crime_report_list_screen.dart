@@ -42,7 +42,7 @@ class _CrimeReportListScreenState extends State<CrimeReportListScreen> {
               controller: _searchController,
               style: TextStyle(color: Colors.white),
               decoration: InputDecoration(
-                labelText: 'Search by street or city',
+                labelText: 'Search by street or city name',
                 labelStyle: TextStyle(color: Colors.white),
                 prefixIcon: Icon(Icons.search, color: Colors.white),
                 filled: true,
