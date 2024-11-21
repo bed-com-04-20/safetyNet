@@ -16,6 +16,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   TextEditingController _emailTextController = TextEditingController();
 
   @override
+
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
