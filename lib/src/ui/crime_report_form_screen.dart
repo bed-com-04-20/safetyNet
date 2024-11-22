@@ -77,15 +77,15 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text("Report Submitted"),
-            content: Text("The crime report has been successfully submitted."),
+            title: const Text("Report Submitted"),
+            content: const Text("The crime report has been successfully submitted."),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                   _formKey.currentState!.reset();
                 },
-                child: Text("OK"),
+                child: const Text("OK"),
               ),
             ],
           ),
@@ -108,8 +108,13 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Crime Report')),
-      backgroundColor: Color(0xFF0A0933),
+      appBar: AppBar(
+        title: const Text('Crime report'),
+        backgroundColor: const Color(0xFF0A0933),
+        foregroundColor: Colors.white,
+      ),
+      backgroundColor: const Color(0xFF0A0933),
+
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -122,7 +127,7 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
                 onFieldSubmitted: (_) {
                   FocusScope.of(context).requestFocus(_cityFocusNode);
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Street',
                   labelStyle: TextStyle(
                       fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
@@ -134,14 +139,14 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
                   street = value!;
                 },
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               TextFormField(
                 focusNode: _cityFocusNode,
                 textInputAction: TextInputAction.next,
                 onFieldSubmitted: (_) {
                   FocusScope.of(context).requestFocus(_detailsFocusNode);
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'City',
                   labelStyle: TextStyle(
                       fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
@@ -153,11 +158,11 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
                   city = value!;
                 },
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               TextFormField(
                 focusNode: _detailsFocusNode,
                 textInputAction: TextInputAction.done,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Crime Details',
                   labelStyle: TextStyle(
                       fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
@@ -170,7 +175,7 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
                   crimeDetails = value!;
                 },
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               reusableButton(
                 context,
                 "Upload Image",
