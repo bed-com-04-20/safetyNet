@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:safetynet/src/ui/crime_report_form_screen.dart';
 import '../ui/home.dart';
 import '../ui/report_form_screen.dart';
 import '../ui/notifications.dart';
 
 class AppRouter extends StatefulWidget {
+  const AppRouter({super.key});
+
   @override
   _AppRouterState createState() => _AppRouterState();
 }
@@ -14,9 +17,9 @@ class _AppRouterState extends State<AppRouter> {
   int _unreadNotificationCount = 0;
 
   final List<Widget> _pages = [
-    HomePage(),
-    ReportFormScreen(),
-    NotificationsScreen(),
+    const HomePage(),
+    const ReportFormScreen(),
+    CrimeReportFormScreen(),
   ];
 
   // Listen for unread notifications from Firebase
@@ -69,7 +72,7 @@ class _AppRouterState extends State<AppRouter> {
               decoration: BoxDecoration(
                 color: Colors.blueAccent.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: Color(0xFF0A0933),
                     blurRadius: 10,
@@ -86,48 +89,22 @@ class _AppRouterState extends State<AppRouter> {
                   selectedItemColor: Colors.white,
                   unselectedItemColor: Colors.white60,
                   backgroundColor: Colors.transparent,
-                  items: [
+                  items: const [
                     BottomNavigationBarItem(
                       icon: Icon(Icons.home),
                       label: 'Home',
                     ),
+
                     BottomNavigationBarItem(
                       icon: Icon(Icons.person),
                       label: 'Report missing person',
                     ),
+
                     BottomNavigationBarItem(
-                      icon: Stack(
-                        children: [
-                          Icon(Icons.notification_add),
-                          if (_unreadNotificationCount > 0)
-                            Positioned(
-                              right: 0,
-                              top: 0,
-                              child: Container(
-                                padding: EdgeInsets.all(2),
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                constraints: BoxConstraints(
-                                  minWidth: 16,
-                                  minHeight: 16,
-                                ),
-                                child: Text(
-                                  '$_unreadNotificationCount',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                      label: 'Notifications',
+                    icon: Icon(Icons.person),
+                    label: 'Report crime',
                     ),
-                  ],
+                  ]
                 ),
               ),
             ),

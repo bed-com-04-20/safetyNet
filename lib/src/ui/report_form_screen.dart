@@ -6,7 +6,6 @@ import '../../models/report_model.dart';
 import '../../services/firestore_service.dart';
 import '../../utils/validators.dart';
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../reusable_widgets/reusable_widgets.dart';
 import 'package:image/image.dart' as img;
 
@@ -164,13 +163,13 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
           Container(
             decoration: const BoxDecoration(color: Color(0xFF0A0933)),
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 60.0), // Bottom padding added
               child: Form(
                 key: _formKey,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: ListView(
                   children: [
-                    TextFormField(
+                     TextFormField(
                       focusNode: _nameFocusNode,
                       textInputAction: TextInputAction.next,
                       onFieldSubmitted: (_) =>
@@ -179,7 +178,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                         labelText: 'Name',
                         labelStyle: TextStyle(
                             fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
-                        hintText: 'Enter the name of the missing person',
+                        hintText: 'Enter the street name',
                         hintStyle: TextStyle(color: Colors.white),
                       ),
                       style: const TextStyle(color: Colors.white),
@@ -310,15 +309,13 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                       ],
                     ),
                     const SizedBox(height: 45.0),
-                    // Upload Image Button using reusableButton
+                    // Image and Buttons
                     reusableButton(
                       context,
                       "Upload Image",
                       _pickImage,
                       icon: Icons.photo,
-                      // customize the button appearance here
                     ),
-                    // Display selected image (that's if any)
                     if (_selectedImage != null)
                       Padding(
                         padding: const EdgeInsets.only(top: 16.0),
@@ -330,15 +327,12 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                         ),
                       ),
                     const SizedBox(height: 30.0),
-                    // Submit Report Button using reusableButton
                     reusableButton(
                       context,
                       "Submit Report",
                       submitReport,
                       icon: Icons.send,
-                      // customize the button appearance here
                     ),
-                    // Add other fields with similar handling
                   ],
                 ),
               ),

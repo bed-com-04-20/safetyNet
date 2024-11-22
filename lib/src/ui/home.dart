@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:safetynet/src/ui/notifications.dart';
+import 'package:safetynet/src/ui/replies.dart';
 import 'package:safetynet/src/ui/report_list_screen.dart';
 import 'package:safetynet/src/ui/signIn.dart';
 
@@ -30,11 +32,20 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
 
         actions: <Widget>[
-          IconButton(onPressed: () {},
+          IconButton(onPressed: () {
+            Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const SignInPage()),
+            );
+          },
               icon: const Icon(Icons.logout_outlined))
+
         ],
 
-        leading: IconButton(onPressed: () {},
+        leading: IconButton(onPressed: () {
+          Navigator.push(context,
+            MaterialPageRoute(builder: (context) => NotificationsScreen()));
+        },
+
             icon: const Icon(Icons.notification_add)),
         backgroundColor: const Color(0xFFeb6958),
         iconTheme: const IconThemeData(color: Colors.white),
