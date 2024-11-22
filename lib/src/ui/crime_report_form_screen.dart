@@ -171,10 +171,11 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
                 },
               ),
               SizedBox(height: 16.0),
-              ElevatedButton.icon(
-                onPressed: _pickImage,
-                icon: Icon(Icons.photo),
-                label: Text("Select Photo"),
+              reusableButton(
+                context,
+                "Upload Image",
+                _pickImage,
+                icon: Icons.photo,
               ),
               if (_selectedImage != null)
                 Padding(
@@ -182,12 +183,16 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
                   child: Image.file(
                     _selectedImage!,
                     height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
                   ),
                 ),
-              SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: submitCrimeReport,
-                child: Text('Submit Crime Report'),
+              const SizedBox(height: 30.0),
+              reusableButton(
+                context,
+                "Submit Crime",
+                submitCrimeReport,
+                icon: Icons.send,
               ),
             ],
           ),

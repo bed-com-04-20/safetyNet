@@ -101,8 +101,8 @@ class _AppRouterState extends State<AppRouter> {
                     ),
 
                     BottomNavigationBarItem(
-                    icon: Icon(Icons.person),
-                    label: 'Report crime',
+                      icon: Icon(Icons.person),
+                      label: 'Report crime',
                     ),
                   ]
                 ),
