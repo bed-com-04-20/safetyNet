@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:safetynet/src/ui/crime_report_list_screen.dart';
 import 'package:safetynet/src/ui/notifications.dart';
 import 'package:safetynet/src/ui/replies.dart';
 import 'package:safetynet/src/ui/report_list_screen.dart';
@@ -102,7 +103,6 @@ class _HomePageState extends State<HomePage> {
           );
         },
       ),
-
     );
   }
 
@@ -112,6 +112,13 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           _selectedIndex = index;
         });
+
+        if (text == 'Crimes') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CrimeReportListScreen()),
+          );
+        }
 
         if (text == 'Missing persons') {
           Navigator.push(
