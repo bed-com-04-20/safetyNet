@@ -25,13 +25,12 @@ class _HomePageState extends State<HomePage> {
         title: const Text(
           'SafetyNet',
           style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
-
         actions: <Widget>[
           IconButton(onPressed: () {
             Navigator.push(context,
@@ -39,19 +38,15 @@ class _HomePageState extends State<HomePage> {
             );
           },
               icon: const Icon(Icons.logout_outlined))
-
         ],
-
         leading: IconButton(onPressed: () {
           Navigator.push(context,
-            MaterialPageRoute(builder: (context) => NotificationsScreen()));
+              MaterialPageRoute(builder: (context) => NotificationsScreen()));
         },
-
             icon: const Icon(Icons.notification_add)),
         backgroundColor: const Color(0xFFeb6958),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-
       body: Builder(
         builder: (context) {
           return SingleChildScrollView(
@@ -70,9 +65,7 @@ class _HomePageState extends State<HomePage> {
                     .animate()
                     .fade(duration: 2000.ms)
                     .slideY(),
-
                 SizedBox(height: 40),
-
                 Padding(
                   padding: EdgeInsets.fromLTRB(
                     20,
@@ -92,9 +85,9 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       SizedBox(height: 20),
-                      buildMissingPersonsSection(),
+                      buildCrimesSection(),  // Show Crimes here
                       SizedBox(height: 20),
-                      buildMissingPersonsSection(),
+                      buildMissingPersonsSection(),  // Show Missing Persons section
                     ],
                   ),
                 ),
@@ -137,6 +130,95 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Section for crimes
+  Widget buildCrimesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text(
+            'Crimes Reports',
+            style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: SizedBox(
+            height: 180,
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('crime_reports')  // Modify this collection name for crimes
+                  .where('status', isEqualTo: 'approved')
+                  .where('visibleToUsers', isEqualTo: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return const Center(child: Text("No crime reports found", style: TextStyle(color: Colors.white)));
+                }
+
+                final reports = snapshot.data!.docs;
+
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: reports.length,
+                  itemBuilder: (context, index) {
+                    var report = reports[index];
+                    String title = report['crimeTitle'] ?? 'Unknown Crime';
+                    String description = report['crimeDescription'] ?? 'No description';
+                    String imageUrl = report['imageUrl'] ?? '';
+
+                    if (imageUrl.isEmpty) {
+                      imageUrl = '';
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8.0),
+                        child: Container(
+                          width: 160,
+                          color: Colors.redAccent.withOpacity(0.3),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: imageUrl.isNotEmpty
+                                    ? Image.network(
+                                  imageUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.warning, size: 80, color: Colors.grey),
+                                )
+                                    : const Icon(Icons.warning, size: 80, color: Colors.grey),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  title,
+                                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Section for missing persons
   Widget buildMissingPersonsSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,7 +278,7 @@ class _HomePageState extends State<HomePage> {
                                   imageUrl,
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) =>
-                                      const Icon(Icons.person, size: 80, color: Colors.grey),
+                                  const Icon(Icons.person, size: 80, color: Colors.grey),
                                 )
                                     : const Icon(Icons.person, size: 80, color: Colors.grey),
                               ),
@@ -212,13 +294,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     Navigator.pushReplacement(
-                      //         context,
-                      //         MaterialPageRoute(builder: (context) => SignInPage()),
-                      //   },
-                      // ),
                     );
                   },
                 );

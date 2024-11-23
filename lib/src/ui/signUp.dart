@@ -28,21 +28,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
     // Validation logic
     if (username.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Username is required')),
+        const SnackBar(content: Text('Username is required')),
       );
       return;
     }
 
     if (email.isEmpty || !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Enter a valid email')),
+        const SnackBar(content: Text('Enter a valid email')),
       );
       return;
     }
 
     if (password.isEmpty || password.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Password must be at least 6 characters long')),
+        const SnackBar(content: Text('Password must be at least 6 characters long')),
       );
       return;
     }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 
 class ConversationScreen extends StatefulWidget {
@@ -51,19 +52,21 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   void _sendMessage(String sender) async {
     String message = _messageController.text.trim();
+    final currentUser = FirebaseAuth.instance.currentUser;
+
     if (message.isNotEmpty || _imageFile != null) {
-      DatabaseReference newMessageRef =
-      _database.child('messages/${widget.reportId}').push();
+      DatabaseReference newMessageRef = _database.child('messages/${widget.reportId}').push();
       String messageId = newMessageRef.key!;
+
+      // If the sender is the current user, mark the message as unread for them
+      bool isCurrentUserSender = sender == currentUser?.displayName;
 
       await newMessageRef.set({
         'text': message,
         'sender': sender,
-        'timestamp': DateTime
-            .now()
-            .millisecondsSinceEpoch,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
         'imageUrl': null,
-        'hasUnreadMessages': sender == 'user',
+        'hasUnreadMessages': isCurrentUserSender, // Set unread based on sender
       });
 
       if (_imageFile != null) {
@@ -75,16 +78,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
       _messageController.clear();
 
-      // Mark all messages as read
+      // If the admin is sending a message, mark all previous messages as read
       if (sender == 'admin') {
         _database.child('messages/${widget.reportId}').once().then((snapshot) {
-          Map<dynamic, dynamic>? messages = snapshot.snapshot.value as Map<
-              dynamic,
-              dynamic>?;
+          Map<dynamic, dynamic>? messages = snapshot.snapshot.value as Map<dynamic, dynamic>?;
           if (messages != null) {
             messages.forEach((key, value) {
-              _database.child('messages/${widget.reportId}/$key').update(
-                  {'hasUnreadMessages': false});
+              _database.child('messages/${widget.reportId}/$key').update({'hasUnreadMessages': false});
             });
           }
         });
@@ -115,8 +115,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 }
 
                 Map<dynamic, dynamic> messages =
-                    (snapshot.data!.snapshot.value as Map<dynamic, dynamic>?) ??
-                        {};
+                    (snapshot.data!.snapshot.value as Map<dynamic, dynamic>?) ?? {};
                 List<Map<dynamic, dynamic>> messageList = messages.entries
                     .map((entry) => entry.value as Map<dynamic, dynamic>)
                     .toList()
@@ -128,19 +127,19 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     var message = messageList[index];
                     bool isAdmin = message['sender'] == 'admin';
 
+                    // Check if the current user has unread messages
+                    bool hasUnreadMessages = message['hasUnreadMessages'] == true &&
+                        message['sender'] != FirebaseAuth.instance.currentUser?.displayName;
+
                     return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 4.0, horizontal: 8.0),
+                      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                       child: Align(
-                        alignment: isAdmin ? Alignment.centerRight : Alignment
-                            .centerLeft,
+                        alignment: isAdmin ? Alignment.centerRight : Alignment.centerLeft,
                         child: Container(
                           decoration: BoxDecoration(
                             color: isAdmin
-                                ? Colors.green.withOpacity(
-                                0.3) // Green for Admin
-                                : Colors.blueAccent.withOpacity(0.3),
-                            // Blue for User
+                                ? Colors.green.withOpacity(0.3) // Green for Admin
+                                : Colors.blueAccent.withOpacity(0.3), // Blue for User
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           padding: const EdgeInsets.all(8.0),
@@ -149,12 +148,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                 ? CrossAxisAlignment.end
                                 : CrossAxisAlignment.start,
                             children: [
-                              if (message['text'] != null &&
-                                  message['text'].isNotEmpty)
+                              if (message['text'] != null && message['text'].isNotEmpty)
                                 Text(
                                   message['text'],
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 16.0),
+                                  style: const TextStyle(color: Colors.white, fontSize: 16.0),
                                 ),
                               if (message['imageUrl'] != null)
                                 Padding(
@@ -167,13 +164,16 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                     loadingBuilder: (context, child, progress) {
                                       return progress == null
                                           ? child
-                                          : const Center(
-                                          child: CircularProgressIndicator());
+                                          : const Center(child: CircularProgressIndicator());
                                     },
-                                    errorBuilder: (context, error,
-                                        stackTrace) =>
+                                    errorBuilder: (context, error, stackTrace) =>
                                     const Icon(Icons.error, color: Colors.red),
                                   ),
+                                ),
+                              if (hasUnreadMessages)
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 8.0),
+                                  child: Icon(Icons.mark_chat_unread, color: Colors.red),
                                 ),
                             ],
                           ),
