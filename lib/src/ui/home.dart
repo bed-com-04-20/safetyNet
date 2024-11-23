@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
         actions: <Widget>[
           IconButton(onPressed: () {
             Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const SignInPage()),
+              MaterialPageRoute(builder: (context) => const SignInPage() ),
             );
           },
               icon: const Icon(Icons.logout_outlined))
@@ -61,10 +61,7 @@ class _HomePageState extends State<HomePage> {
                     fontSize: 20,
                     fontWeight: FontWeight.normal,
                   ),
-                )
-                    .animate()
-                    .fade(duration: 2000.ms)
-                    .slideY(),
+                ).animate().fade(duration: 2000.ms).slideY(),
                 SizedBox(height: 40),
                 Padding(
                   padding: EdgeInsets.fromLTRB(
@@ -85,13 +82,13 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       SizedBox(height: 20),
-                      buildCrimesSection(),  // Show Crimes here
+                      buildCrimesSection(),  // Horizontal scroll for crimes
                       SizedBox(height: 20),
-                      buildMissingPersonsSection(),  // Show Missing Persons section
+                      buildMissingPersonsSection(),
                     ],
                   ),
                 ),
-              ], // Closing the 'children' list here
+              ],
             ),
           );
         },
@@ -130,7 +127,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Section for crimes
+  // Section for crimes with horizontal scrolling
   Widget buildCrimesSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,7 +146,7 @@ class _HomePageState extends State<HomePage> {
             height: 180,
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
-                  .collection('crime_reports')  // Modify this collection name for crimes
+                  .collection('crime_reports')  // Firestore collection for crime reports
                   .where('status', isEqualTo: 'approved')
                   .where('visibleToUsers', isEqualTo: true)
                   .snapshots(),
@@ -218,7 +215,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Section for missing persons
+  // Section for missing persons (no changes)
   Widget buildMissingPersonsSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -258,10 +255,6 @@ class _HomePageState extends State<HomePage> {
                     var report = reports[index];
                     String name = report['missingPersonName'] ?? 'Unknown';
                     String imageUrl = report['imageUrl'] ?? '';
-
-                    if (imageUrl.isEmpty) {
-                      imageUrl = '';
-                    }
 
                     return Padding(
                       padding: const EdgeInsets.only(right: 10),
