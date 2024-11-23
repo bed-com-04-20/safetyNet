@@ -7,6 +7,7 @@ import 'package:safetynet/src/ui/crime_report_form_screen.dart';
 import 'package:safetynet/src/ui/report_form_screen.dart';
 import 'package:safetynet/src/ui/home.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:safetynet/src/ui/bottom_nav_bar.dart'; // Import BottomNavBar
 
 class AdminReportScreen extends StatefulWidget {
   const AdminReportScreen({super.key});
@@ -304,42 +305,8 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
             ),
           ),
 
-          // Floating Bottom Navigation Bar
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.blueAccent.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0xFF0A0933),
-                  blurRadius: 10,
-                  spreadRadius: 1,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            margin: const EdgeInsets.all(10),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(50),
-              child: BottomNavigationBar(
-                onTap: onTabTapped,
-                currentIndex: _currentIndex,
-                selectedItemColor: Colors.white,
-                unselectedItemColor: Colors.white60,
-                backgroundColor: Colors.transparent,
-                items: const [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.home),
-                    label: 'Missing persons',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.person),
-                    label: 'Crimes',
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // Floating Bottom Navigation Bar with conditional display for admins
+          BottomNavBar(isAdminPage: true),  // Use the BottomNavBar widget here
         ],
       ),
     );
