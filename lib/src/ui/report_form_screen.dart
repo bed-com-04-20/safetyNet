@@ -1,3 +1,22 @@
+// import 'package:flutter/material.dart';
+// import 'report_form.dart';
+//
+// class ReportFormScreen extends StatelessWidget {
+//     ReportFormScreen({super.key});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: ReportForm(),
+//     );
+//   }
+// }
+//
+
+
+
+
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -186,6 +205,9 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                       onSaved: (value) => missingPersonName = value!,
                     ),
                     const SizedBox(height: 16.0),
+
+
+
                     TextFormField(
                       focusNode: _ageFocusNode,
                       textInputAction: TextInputAction.next,
