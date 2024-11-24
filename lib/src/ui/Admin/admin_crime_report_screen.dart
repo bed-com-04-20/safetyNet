@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:safetynet/src/ui/signIn.dart';
 import '../../../../../../services/firestore_service.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'admins_approval.dart';
 import 'admins_replay.dart';
 
 class AdminCrimeReportScreen extends StatefulWidget {
@@ -17,6 +18,7 @@ class _AdminCrimeReportScreenState extends State<AdminCrimeReportScreen> {
   String _selectedStatusFilter = "All";
   final List<String> _statusOptions = ["All", "submitted", "approved", "rejected"];
   int _unreadNotificationCount = 0;
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -127,6 +129,64 @@ class _AdminCrimeReportScreenState extends State<AdminCrimeReportScreen> {
         backgroundColor: const Color(0xFF0A0933),
       ),
       backgroundColor: const Color(0xFF0A0933),
+
+      // Floating Bottom Navigation Bar
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.blueAccent.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0xFF0A0933),
+              blurRadius: 10,
+              spreadRadius: 1,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        margin: const EdgeInsets.all(10),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(50),
+          child: BottomNavigationBar(
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.white60,
+            backgroundColor: Colors.transparent,
+            currentIndex: _currentIndex,
+            onTap: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+
+              if (index == 0) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AdminReportScreen(),
+                  ),
+                );
+              } else if (index == 1) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AdminCrimeReportScreen(),
+                  ),
+                );
+              }
+            },
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: 'Missing Persons',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                label: 'Crimes',
+              ),
+            ],
+          ),
+        ),
+      ),
+
       body: Column(
         children: [
           // Filter Dropdown

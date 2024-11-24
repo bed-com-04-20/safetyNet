@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:safetynet/src/ui/Admin/admin_crime_report_screen.dart';
+import 'package:safetynet/src/ui/Admin/notification_badge.dart';
 import 'package:safetynet/src/ui/signIn.dart';
 import '../../../../../../services/firestore_service.dart';
 import 'admins_replay.dart';
@@ -68,11 +69,11 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.notifications, color: Colors.white),
+          icon: const Icon(Icons.logout_outlined, color: Colors.white),
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ConversationListScreen()),
+              MaterialPageRoute(builder: (context) => SignInPage()),
             );
           },
         ),
@@ -90,13 +91,13 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const SignInPage()),
+                  MaterialPageRoute(builder: (context) => NotificationsScreen()),
                 );
               },
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  const Icon(Icons.logout_outlined, color: Colors.white),
+                  const Icon(Icons.notifications, color: Colors.white),
                   StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection('missing_person_reports')
