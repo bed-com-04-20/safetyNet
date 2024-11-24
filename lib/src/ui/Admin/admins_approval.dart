@@ -353,11 +353,11 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
                 items: const [
                   BottomNavigationBarItem(
                     icon: Icon(Icons.home),
-                    label: 'Home',
+                    label: 'Missing Persons',
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.person),
-                    label: 'Report missing person',
+                    label: 'Crimes',
                   ),
                 ],
               ),
