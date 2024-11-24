@@ -19,6 +19,23 @@ class _CrimeReportListScreenState extends State<CrimeReportListScreen> {
     super.dispose();
   }
 
+  // Function to approve the report (by admin)
+  Future<void> _approveReport(String reportId) async {
+    try {
+      await crimeReportsCollection.doc(reportId).update({
+        'status': 'approved',
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Report approved successfully!")),
+      );
+    } catch (e) {
+      print("Error approving report: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error approving the report")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,6 +120,8 @@ class _CrimeReportListScreenState extends State<CrimeReportListScreen> {
                       String city = doc['city'] ?? 'Unknown';
                       String crimeDetails = doc['crimeDetails'] ?? 'No details provided';
                       String imageUrl = doc['imageUrl'] ?? '';
+                      String status = doc['status'] ?? 'submitted';  // New field for report status
+                      String reportId = doc.id;
 
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -174,6 +193,27 @@ class _CrimeReportListScreenState extends State<CrimeReportListScreen> {
                                           color: Colors.white60,
                                         ),
                                       ),
+                                      SizedBox(height: 8.0),
+                                      Text(
+                                        'Status: $status',
+                                        style: TextStyle(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: status == 'approved'
+                                              ? Colors.green
+                                              : Colors.red,
+                                        ),
+                                      ),
+                                      if (status == 'submitted')
+                                        SizedBox(height: 8.0),
+                                      if (status == 'submitted')
+                                        ElevatedButton(
+                                          onPressed: () => _approveReport(reportId),
+                                          child: Text('Approve Report'),
+                                          style: ElevatedButton.styleFrom(
+                                            primary: Colors.green,
+                                          ),
+                                        ),
                                     ],
                                   ),
                                 ),

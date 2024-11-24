@@ -70,6 +70,7 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
         crimeDetails: crimeDetails,
         imageUrl: _imageUrl,
         timestamp: DateTime.now(),
+        status: 'pending',  // Report status is set to pending for admin approval
       );
 
       try {
@@ -78,7 +79,7 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
           context: context,
           builder: (context) => AlertDialog(
             title: const Text("Report Submitted"),
-            content: const Text("The crime report has been successfully submitted."),
+            content: const Text("The crime report has been successfully submitted and is awaiting approval from an admin."),
             actions: [
               TextButton(
                 onPressed: () {
@@ -134,6 +135,7 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
                   hintText: 'Enter the street name',
                   hintStyle: TextStyle(color: Colors.white),
                 ),
+                style: const TextStyle(color: Colors.white), // Ensuring text is white
                 validator: (value) => value!.isEmpty ? 'Please enter a street' : null,
                 onSaved: (value) {
                   street = value!;
@@ -153,6 +155,7 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
                   hintText: 'Enter the city name',
                   hintStyle: TextStyle(color: Colors.white),
                 ),
+                style: const TextStyle(color: Colors.white), // Ensuring text is white
                 validator: (value) => value!.isEmpty ? 'Please enter a city' : null,
                 onSaved: (value) {
                   city = value!;
@@ -169,6 +172,7 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
                   hintText: 'Enter the details',
                   hintStyle: TextStyle(color: Colors.white),
                 ),
+                style: const TextStyle(color: Colors.white), // Ensuring text is white
                 maxLines: 4,
                 validator: (value) => value!.isEmpty ? 'Please enter crime details' : null,
                 onSaved: (value) {
