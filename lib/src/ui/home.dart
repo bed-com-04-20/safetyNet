@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: 40),
+                SizedBox(height: 20),
                 const Text(
                   'Empowering communities to take action',
                   style: TextStyle(
@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> {
                     fontWeight: FontWeight.normal,
                   ),
                 ).animate().fade(duration: 2000.ms).slideY(),
-                SizedBox(height: 40),
+                SizedBox(height: 10),
                 Padding(
                   padding: EdgeInsets.fromLTRB(
                     20,
