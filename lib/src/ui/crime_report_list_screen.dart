@@ -211,7 +211,7 @@ class _CrimeReportListScreenState extends State<CrimeReportListScreen> {
                                           onPressed: () => _approveReport(reportId),
                                           child: Text('Approve Report'),
                                           style: ElevatedButton.styleFrom(
-                                            primary: Colors.green,
+                                            backgroundColor: Colors.green,
                                           ),
                                         ),
                                     ],

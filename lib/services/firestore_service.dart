@@ -98,7 +98,8 @@ class FirestoreService {
           city: doc['city'],
           crimeDetails: doc['crimeDetails'],
           imageUrl: doc['imageUrl'],
-          timestamp: DateTime.parse(doc['timestamp']),
+          timestamp: doc['timestamp'].toDate().toIso8601String(), // Ensure timestamp is properly formatted
+          status: doc['status'] ?? 'pending',  // Handle the 'status' field
         );
       }).toList();
     } catch (error) {
