@@ -23,7 +23,10 @@ class DetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Details of $name')),
+      appBar: AppBar(title: Text('Details of $name'),
+          backgroundColor: Colors.transparent,
+      ),
+
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: const BoxDecoration(
@@ -41,7 +44,7 @@ class DetailScreen extends StatelessWidget {
                   ),
                   child: CachedNetworkImage(
                     imageUrl: imageUrl,
-                    height: 400,
+                    height: 470,
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),

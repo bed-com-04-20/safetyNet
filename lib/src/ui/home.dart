@@ -49,7 +49,7 @@ class _HomePageState extends State<HomePage> {
               MaterialPageRoute(builder: (context) => NotificationsScreen()),
             );
           },
-          icon: const Icon(Icons.notification_add),
+          icon: const Icon(Icons.notifications),
         ),
         backgroundColor: const Color(0xFFeb6958),
         iconTheme: const IconThemeData(color: Colors.white),
