@@ -24,11 +24,13 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
   String street = '';
   String city = '';
   String crimeDetails = '';
+  String crimeTitle = ''; // New field for Crime Title
 
   // Focus nodes for managing field navigation
   final FocusNode _streetFocusNode = FocusNode();
   final FocusNode _cityFocusNode = FocusNode();
   final FocusNode _detailsFocusNode = FocusNode();
+  final FocusNode _titleFocusNode = FocusNode(); // New FocusNode for CrimeTitle
 
   // Pick an image from the gallery
   Future<void> _pickImage() async {
@@ -40,17 +42,21 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
     }
   }
 
-  // Upload the image to Firebase Storage
-  Future<String> _uploadImage(File image) async {
+  // Upload the selected image to Firebase Storage
+  Future<String?> _uploadImage(File image) async {
     try {
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child('crime_reports/${DateTime.now()}.jpg');
-      final uploadTask = storageRef.putFile(image);
-      final snapshot = await uploadTask;
-      return await snapshot.ref.getDownloadURL();
+      // Create a reference to Firebase Storage
+      final storageRef = FirebaseStorage.instance.ref().child('crime_reports/${DateTime.now().millisecondsSinceEpoch}.jpg');
+
+      // Upload the file to Firebase Storage
+      await storageRef.putFile(image);
+
+      // Get the download URL after the upload is complete
+      String downloadUrl = await storageRef.getDownloadURL();
+      return downloadUrl;
     } catch (e) {
-      throw Exception('Error uploading image: $e');
+      print("Error uploading image: $e");
+      return null;
     }
   }
 
@@ -65,12 +71,13 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
       }
 
       CrimeReportModel newCrimeReport = CrimeReportModel(
+        crimeTitle: crimeTitle, // Add the CrimeTitle here
         street: street,
         city: city,
         crimeDetails: crimeDetails,
         imageUrl: _imageUrl,
         timestamp: DateTime.now(),
-        status: 'pending',  // Report status is set to pending for admin approval
+        status: 'pending', // Report status is set to pending for admin approval
       );
 
       try {
@@ -98,15 +105,6 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
   }
 
   @override
-  void dispose() {
-    // Dispose focus nodes to avoid memory leaks
-    _streetFocusNode.dispose();
-    _cityFocusNode.dispose();
-    _detailsFocusNode.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -122,6 +120,28 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
           key: _formKey,
           child: ListView(
             children: [
+              // CrimeTitle TextFormField
+              TextFormField(
+                focusNode: _titleFocusNode,
+                textInputAction: TextInputAction.next,
+                onFieldSubmitted: (_) {
+                  FocusScope.of(context).requestFocus(_streetFocusNode);
+                },
+                decoration: const InputDecoration(
+                  labelText: 'Crime Title',
+                  labelStyle: TextStyle(
+                      fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
+                  hintText: 'Enter the title of the crime',
+                  hintStyle: TextStyle(color: Colors.white),
+                ),
+                style: const TextStyle(color: Colors.white), // Ensuring text is white
+                validator: (value) => value!.isEmpty ? 'Please enter a crime title' : null,
+                onSaved: (value) {
+                  crimeTitle = value!;
+                },
+              ),
+              const SizedBox(height: 16.0),
+              // Street TextFormField
               TextFormField(
                 focusNode: _streetFocusNode,
                 textInputAction: TextInputAction.next,
@@ -142,6 +162,7 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
                 },
               ),
               const SizedBox(height: 16.0),
+              // City TextFormField
               TextFormField(
                 focusNode: _cityFocusNode,
                 textInputAction: TextInputAction.next,
@@ -162,46 +183,35 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
                 },
               ),
               const SizedBox(height: 16.0),
+              // Crime Details TextFormField
               TextFormField(
                 focusNode: _detailsFocusNode,
                 textInputAction: TextInputAction.done,
+                onFieldSubmitted: (_) {
+                  submitCrimeReport();
+                },
                 decoration: const InputDecoration(
                   labelText: 'Crime Details',
                   labelStyle: TextStyle(
                       fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
-                  hintText: 'Enter the details',
+                  hintText: 'Provide details of the crime',
                   hintStyle: TextStyle(color: Colors.white),
                 ),
                 style: const TextStyle(color: Colors.white), // Ensuring text is white
-                maxLines: 4,
                 validator: (value) => value!.isEmpty ? 'Please enter crime details' : null,
                 onSaved: (value) {
                   crimeDetails = value!;
                 },
               ),
               const SizedBox(height: 16.0),
-              reusableButton(
-                context,
-                "Upload Image",
-                _pickImage,
-                icon: Icons.photo,
+              ElevatedButton(
+                onPressed: _pickImage,
+                child: const Text('Pick an Image'),
               ),
-              if (_selectedImage != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
-                  child: Image.file(
-                    _selectedImage!,
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              const SizedBox(height: 30.0),
-              reusableButton(
-                context,
-                "Submit Crime",
-                submitCrimeReport,
-                icon: Icons.send,
+              const SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: submitCrimeReport,
+                child: const Text('Submit Crime Report'),
               ),
             ],
           ),

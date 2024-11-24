@@ -94,6 +94,7 @@ class FirestoreService {
       QuerySnapshot snapshot = await crimeReportsCollection.get();
       return snapshot.docs.map((doc) {
         return CrimeReportModel(
+          crimeTitle: doc['crimeTitle'],  // Fetch the CrimeTitle field
           street: doc['street'],
           city: doc['city'],
           crimeDetails: doc['crimeDetails'],
@@ -113,14 +114,12 @@ class FirestoreService {
 
     try {
       await reportRef.update({
-        'messages': FieldValue.arrayUnion([
-          {
-            'text': replyText,
-            'senderId': senderId, // Use the Admin's ID or hardcode 'Admin'
-            'timestamp': FieldValue.serverTimestamp(),
-            'isReplied': true, // Mark as replied
-          },
-        ]),
+        'messages': FieldValue.arrayUnion([{
+          'text': replyText,
+          'senderId': senderId, // Use the Admin's ID or hardcode 'Admin'
+          'timestamp': FieldValue.serverTimestamp(),
+          'isReplied': true, // Mark as replied
+        }]),
       });
     } catch (error) {
       throw Exception("Error replying to message: $error");

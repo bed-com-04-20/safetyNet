@@ -32,18 +32,25 @@ class _HomePageState extends State<HomePage> {
         ),
         centerTitle: true,
         actions: <Widget>[
-          IconButton(onPressed: () {
-            Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const SignInPage() ),
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SignInPage()),
+              );
+            },
+            icon: const Icon(Icons.logout_outlined),
+          )
+        ],
+        leading: IconButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => NotificationsScreen()),
             );
           },
-              icon: const Icon(Icons.logout_outlined))
-        ],
-        leading: IconButton(onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => NotificationsScreen()));
-        },
-            icon: const Icon(Icons.notification_add)),
+          icon: const Icon(Icons.notification_add),
+        ),
         backgroundColor: const Color(0xFFeb6958),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -82,7 +89,7 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       SizedBox(height: 20),
-                      buildCrimesSection(),  // Horizontal scroll for crimes
+                      buildCrimesSection(),
                       SizedBox(height: 20),
                       buildMissingPersonsSection(),
                     ],
@@ -146,7 +153,7 @@ class _HomePageState extends State<HomePage> {
             height: 180,
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
-                  .collection('crime_reports')  // Firestore collection for crime reports
+                  .collection('crime_reports')
                   .where('status', isEqualTo: 'approved')
                   .where('visibleToUsers', isEqualTo: true)
                   .snapshots(),
@@ -165,13 +172,9 @@ class _HomePageState extends State<HomePage> {
                   itemCount: reports.length,
                   itemBuilder: (context, index) {
                     var report = reports[index];
-                    String title = report['crimeTitle'] ?? 'Unknown Crime';
-                    String description = report['crimeDescription'] ?? 'No description';
+                    String title = report['city'] ?? 'Unknown City';
+                    String description = report['crimeDetails'] ?? 'No details provided';
                     String imageUrl = report['imageUrl'] ?? '';
-
-                    if (imageUrl.isEmpty) {
-                      imageUrl = '';
-                    }
 
                     return Padding(
                       padding: const EdgeInsets.only(right: 10),
@@ -196,7 +199,8 @@ class _HomePageState extends State<HomePage> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
                                   title,
-                                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
@@ -215,7 +219,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Section for missing persons (no changes)
+  // Section for missing persons
   Widget buildMissingPersonsSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,7 +283,8 @@ class _HomePageState extends State<HomePage> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
                                   name,
-                                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
