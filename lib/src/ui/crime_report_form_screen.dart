@@ -204,14 +204,28 @@ class _CrimeReportFormScreenState extends State<CrimeReportFormScreen> {
                 },
               ),
               const SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: _pickImage,
-                child: const Text('Pick an Image'),
+              reusableButton(
+                context,
+                "Upload Image",
+                _pickImage,
+                icon: Icons.photo,
               ),
-              const SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: submitCrimeReport,
-                child: const Text('Submit Crime Report'),
+              if (_selectedImage != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Image.file(
+                    _selectedImage!,
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              const SizedBox(height: 30.0),
+              reusableButton(
+                context,
+                "Submit Crime",
+                submitCrimeReport,
+                icon: Icons.send,
               ),
             ],
           ),
