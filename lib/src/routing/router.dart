@@ -4,7 +4,6 @@ import 'package:safetynet/src/ui/crime_report_form_screen.dart';
 import '../ui/home.dart';
 import '../ui/report_form_screen.dart';
 import '../ui/notifications.dart';
-import 'package:safetynet/src/ui/bottom_nav_bar.dart';  // Import the reusable BottomNavBar
 
 class AppRouter extends StatefulWidget {
   const AppRouter({super.key});
@@ -30,7 +29,6 @@ class _AppRouterState extends State<AppRouter> {
         .onValue
         .listen((event) {
       final data = event.snapshot.value as Map<dynamic, dynamic>?;
-
       if (data != null) {
         int unreadCount = 0;
         data.forEach((key, value) {
@@ -63,7 +61,7 @@ class _AppRouterState extends State<AppRouter> {
     return Scaffold(
       body: Stack(
         children: [
-          _pages[_currentIndex],  // Display current page based on tab selection
+          _pages[_currentIndex],
 
           // Floating Bottom Navigation Bar
           Positioned(
@@ -85,10 +83,28 @@ class _AppRouterState extends State<AppRouter> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(50),
-                child: BottomNavBar(
-                  onTabTapped: onTabTapped,       // Handle tab change
-                  currentIndex: _currentIndex,     // Current tab index
-                  unreadNotificationCount: _unreadNotificationCount, // Unread notifications
+                child: BottomNavigationBar(
+                  onTap: onTabTapped,
+                  currentIndex: _currentIndex,
+                  selectedItemColor: Colors.white,
+                  unselectedItemColor: Colors.white60,
+                  backgroundColor: Colors.transparent,
+                  items: const [
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.home),
+                      label: 'Home',
+                    ),
+
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.person),
+                      label: 'Report missing person',
+                    ),
+
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.person),
+                      label: 'Report crime',
+                    ),
+                  ]
                 ),
               ),
             ),

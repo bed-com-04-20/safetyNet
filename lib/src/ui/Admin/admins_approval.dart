@@ -1,13 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:safetynet/src/ui/Admin/admin_crime_report_screen.dart';
 import 'package:safetynet/src/ui/signIn.dart';
 import '../../../../../../services/firestore_service.dart';
 import 'admins_replay.dart';
-import 'package:safetynet/src/ui/crime_report_form_screen.dart';
 import 'package:safetynet/src/ui/report_form_screen.dart';
 import 'package:safetynet/src/ui/home.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:safetynet/src/ui/bottom_nav_bar.dart'; // Import BottomNavBar
 
 class AdminReportScreen extends StatefulWidget {
   const AdminReportScreen({super.key});
@@ -28,7 +27,6 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
   final List<Widget> _pages = [
     const HomePage(),
     const ReportFormScreen(),
-    CrimeReportFormScreen(),
   ];
 
   // Listen for unread notifications from Firebase
@@ -70,11 +68,11 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.notifications, color: Colors.white),
           onPressed: () {
-            Navigator.pushReplacement(
+            Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const SignInPage()),
+              MaterialPageRoute(builder: (context) => ConversationListScreen()),
             );
           },
         ),
@@ -90,15 +88,15 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
             ),
             GestureDetector(
               onTap: () {
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => ConversationListScreen()),
+                  MaterialPageRoute(builder: (context) => const SignInPage()),
                 );
               },
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  const Icon(Icons.notifications, color: Colors.white),
+                  const Icon(Icons.logout_outlined, color: Colors.white),
                   StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection('missing_person_reports')
@@ -305,8 +303,66 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
             ),
           ),
 
-          // Floating Bottom Navigation Bar with conditional display for admins
-          BottomNavBar(isAdminPage: true),  // Use the BottomNavBar widget here
+          // Floating Bottom Navigation Bar with Two Items
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.blueAccent.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0xFF0A0933),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            margin: const EdgeInsets.all(10),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(50),
+              child: BottomNavigationBar(
+                selectedItemColor: Colors.white,
+                unselectedItemColor: Colors.white60,
+                backgroundColor: Colors.transparent,
+
+                onTap: (index) {
+                  setState(() {
+                    _currentIndex = index;
+                    // Update the current index for navigation
+                  });
+
+                  // Navigate based on the selected index
+                  if (index == 0) {
+                    // Navigate to the Reports page
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AdminReportScreen(),
+                      ),
+                    );
+                  } else if (index == 1) {
+                    // Navigate to the Add Report page
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AdminCrimeReportScreen(),
+                      ),
+                    );
+                  }
+                },
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.home),
+                    label: 'Home',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.person),
+                    label: 'Report missing person',
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

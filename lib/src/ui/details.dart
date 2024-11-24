@@ -9,15 +9,15 @@ class DetailScreen extends StatelessWidget {
   final String location;
   final String details;
   final String imageUrl;
-  final String reportId; // Add a unique identifier for the report
+  final String reportId;
 
-  DetailScreen({
+  const DetailScreen({
     required this.name,
     required this.lastSeen,
     required this.location,
     required this.details,
     required this.imageUrl,
-    required this.reportId, // Accept the unique identifier in the constructor
+    required this.reportId,
   });
 
   @override
@@ -26,7 +26,7 @@ class DetailScreen extends StatelessWidget {
       appBar: AppBar(title: Text('Details of $name')),
       body: Container(
         height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Color(0xFF0A0933),
         ),
         child: SingleChildScrollView(
@@ -35,7 +35,7 @@ class DetailScreen extends StatelessWidget {
             children: [
               if (imageUrl.isNotEmpty)
                 ClipRRect(
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(32.0),
                     bottomRight: Radius.circular(32.0),
                   ),
@@ -48,7 +48,7 @@ class DetailScreen extends StatelessWidget {
                 )
               else
                 ClipRRect(
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(32.0),
                     bottomRight: Radius.circular(32.0),
                   ),
@@ -56,50 +56,50 @@ class DetailScreen extends StatelessWidget {
                     height: 300,
                     width: double.infinity,
                     color: Colors.grey[300],
-                    child: Icon(
+                    child: const Icon(
                       Icons.person,
                       size: 120,
                       color: Colors.white,
                     ),
                   ),
                 ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               Padding(
                 padding: const EdgeInsets.only(left: 16.0),
                 child: Text(
                   'Name: $name',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 22,
                     color: Colors.white,
                   ),
                 ),
               ),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Padding(
                 padding: const EdgeInsets.only(left: 16.0),
                 child: Text(
                   'Last Seen: $lastSeen',
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Padding(
                 padding: const EdgeInsets.only(left: 16.0),
                 child: Text(
                   'Location: $location',
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Padding(
                 padding: const EdgeInsets.only(left: 16.0),
                 child: Text(
                   'Details: $details',
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               Center(
                 child: reusableButton(
                   context,
@@ -109,8 +109,8 @@ class DetailScreen extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => ConversationScreen(
-                          name: name, // Pass the person's name
-                          reportId: reportId, // Pass the report ID for specific targeting
+                          name: name,
+                          reportId: reportId,
                         ),
                       ),
                     );
