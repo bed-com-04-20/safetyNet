@@ -11,7 +11,7 @@ class _CrimeReportListScreenState extends State<CrimeReportListScreen> {
   final CollectionReference crimeReportsCollection =
   FirebaseFirestore.instance.collection('crime_reports');
   String _searchQuery = "";
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void dispose() {
@@ -26,12 +26,12 @@ class _CrimeReportListScreenState extends State<CrimeReportListScreen> {
         'status': 'approved',
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Report approved successfully!")),
+        const SnackBar(content: Text("Report approved successfully!")),
       );
     } catch (e) {
       print("Error approving report: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error approving the report")),
+        const SnackBar(content: Text("Error approving the report")),
       );
     }
   }
@@ -39,16 +39,16 @@ class _CrimeReportListScreenState extends State<CrimeReportListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF0A0933),
+      backgroundColor: const Color(0xFF0A0933),
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Crime Reports',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ),
-        backgroundColor: Color(0xFF0A0933),
+        backgroundColor: const Color(0xFF0A0933),
         foregroundColor: Colors.white,
       ),
       body: Column(
@@ -57,11 +57,11 @@ class _CrimeReportListScreenState extends State<CrimeReportListScreen> {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: _searchController,
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: 'Search by street or city',
-                labelStyle: TextStyle(color: Colors.white),
-                prefixIcon: Icon(Icons.search, color: Colors.white),
+                labelStyle: const TextStyle(color: Colors.white),
+                prefixIcon: const Icon(Icons.search, color: Colors.white),
                 filled: true,
                 fillColor: Colors.blueAccent,
                 border: OutlineInputBorder(
@@ -81,7 +81,7 @@ class _CrimeReportListScreenState extends State<CrimeReportListScreen> {
               stream: crimeReportsCollection.snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Center(
+                  return const Center(
                     child: Text(
                       'Error fetching crime reports',
                       style: TextStyle(color: Colors.white),
@@ -90,7 +90,7 @@ class _CrimeReportListScreenState extends State<CrimeReportListScreen> {
                 }
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 if (snapshot.hasData) {
@@ -104,7 +104,7 @@ class _CrimeReportListScreenState extends State<CrimeReportListScreen> {
                       .toList();
 
                   if (reports.isEmpty) {
-                    return Center(
+                    return const Center(
                       child: Text(
                         'No matching reports found',
                         style: TextStyle(color: Colors.white),
@@ -120,7 +120,7 @@ class _CrimeReportListScreenState extends State<CrimeReportListScreen> {
                       String city = doc['city'] ?? 'Unknown';
                       String crimeDetails = doc['crimeDetails'] ?? 'No details provided';
                       String imageUrl = doc['imageUrl'] ?? '';
-                      String status = doc['status'] ?? 'submitted';  // New field for report status
+                      String status = doc['status'] ?? 'submitted';
                       String reportId = doc.id;
 
                       return Padding(
@@ -145,9 +145,9 @@ class _CrimeReportListScreenState extends State<CrimeReportListScreen> {
                                       width: 100,
                                       fit: BoxFit.cover,
                                       placeholder: (context, url) =>
-                                          Center(child: CircularProgressIndicator()),
+                                          const Center(child: CircularProgressIndicator()),
                                       errorWidget: (context, url, error) =>
-                                          Icon(Icons.error, color: Colors.red, size: 100),
+                                          const Icon(Icons.error, color: Colors.red, size: 100),
                                     ),
                                   )
                                 else
@@ -158,37 +158,37 @@ class _CrimeReportListScreenState extends State<CrimeReportListScreen> {
                                       color: Colors.grey[300],
                                       borderRadius: BorderRadius.circular(10),
                                     ),
-                                    child: Icon(
+                                    child: const Icon(
                                       Icons.report,
                                       size: 50,
                                       color: Colors.white,
                                     ),
                                   ),
-                                SizedBox(width: 16.0),
+                                const SizedBox(width: 16.0),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Street: $street',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: Colors.white60,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18.0,
                                         ),
                                       ),
-                                      SizedBox(height: 8.0),
+                                      const SizedBox(height: 8.0),
                                       Text(
                                         'City: $city',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 16.0,
                                           color: Colors.white60,
                                         ),
                                       ),
-                                      SizedBox(height: 8.0),
+                                      const SizedBox(height: 8.0),
                                       Text(
                                         'Details: $crimeDetails',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 14.0,
                                           color: Colors.white60,
                                         ),

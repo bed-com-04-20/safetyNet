@@ -84,7 +84,7 @@ class _ReportListScreenState extends State<ReportListScreen> {
                         .toList();
 
                     if (reports.isEmpty) {
-                      return Center(
+                      return const Center(
                         child: Text(
                           'No matching reports found',
                           style: TextStyle(color: Colors.white),

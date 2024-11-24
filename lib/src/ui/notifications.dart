@@ -27,6 +27,7 @@ class NotificationsScreen extends StatelessWidget {
             return const Center(child: Text("No data found", style: TextStyle(color: Colors.white)));
           }
 
+          // Extract relevant notifications and get admin names dynamically
           final reports = castedData.entries.where((entry) {
             final messages = entry.value as Map<dynamic, dynamic>? ?? {};
             return messages.values.any((msg) {
@@ -35,19 +36,32 @@ class NotificationsScreen extends StatelessWidget {
               }
               return false;
             });
-          }).map((entry) {
+          }).map((entry) async {
             final reportId = entry.key;
             final messages = entry.value as Map<dynamic, dynamic>? ?? {};
-            final senderName = messages.isNotEmpty ? messages.values.first['senderName'] ?? 'Unknown' : 'Unknown';
+
+            // Retrieve admin's name from users node
+            final adminMessage = messages.values.firstWhere(
+                  (msg) => msg is Map<dynamic, dynamic> && msg['senderRole'] == 'admin',
+              orElse: () => null,
+            );
+
+            String senderName = 'Unknown Admin';
+            if (adminMessage != null) {
+              final adminId = adminMessage['senderId']; // Assuming senderId field is available
+              final adminDataSnapshot = await FirebaseDatabase.instance.ref('users/$adminId').get();
+
+              if (adminDataSnapshot.exists) {
+                final adminData = adminDataSnapshot.value as Map<dynamic, dynamic>?;
+                if (adminData != null && adminData.containsKey('name')) {
+                  senderName = adminData['name'] ?? 'Unknown Admin';
+                }
+              }
+            }
+
             final hasUnreadMessages = messages.values.any((msg) {
               if (msg is Map<dynamic, dynamic>) {
                 return msg['hasUnreadMessages']?.toString().toLowerCase() == 'true';
-              }
-              return false;
-            });
-            final isAdmin = messages.values.any((msg) {
-              if (msg is Map<dynamic, dynamic>) {
-                return msg['senderRole'] == 'admin';
               }
               return false;
             });
@@ -56,36 +70,50 @@ class NotificationsScreen extends StatelessWidget {
               'reportId': reportId,
               'senderName': senderName,
               'hasUnreadMessages': hasUnreadMessages,
-              'isAdmin': isAdmin,
             };
           }).toList();
 
-          return ListView.builder(
-            itemCount: reports.length,
-            itemBuilder: (context, index) {
-              final report = reports[index];
-              return Card(
-                color: report['isAdmin'] ? Color(0xFFeb6958) : null, // Apply color if admin
-                child: ListTile(
-                  title: Text(
-                    'Sender: ${report['senderName']}',
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                  trailing: report['hasUnreadMessages']
-                      ? const Icon(Icons.mark_chat_unread, color: Colors.red)
-                      : null,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ConversationScreen(
-                          name: 'Report ${report['reportId']}',
-                          reportId: report['reportId'],
-                        ),
+          return FutureBuilder<List<Map<String, dynamic>>>(
+            future: Future.wait(reports),
+            builder: (context, futureSnapshot) {
+              if (futureSnapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (!futureSnapshot.hasData || futureSnapshot.data!.isEmpty) {
+                return const Center(child: Text("No data found", style: TextStyle(color: Colors.white)));
+              }
+
+              final reports = futureSnapshot.data!;
+
+              return ListView.builder(
+                itemCount: reports.length,
+                itemBuilder: (context, index) {
+                  final report = reports[index];
+                  return Card(
+                    color: const Color(0xFFeb6958), // Admin-specific color
+                    child: ListTile(
+                      title: Text(
+                        'Admin: ${report['senderName']}',
+                        style: const TextStyle(color: Colors.black),
                       ),
-                    );
-                  },
-                ),
+                      trailing: report['hasUnreadMessages']
+                          ? const Icon(Icons.mark_chat_unread, color: Colors.red)
+                          : null,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ConversationScreen(
+                              name: 'Conversation with ${report['senderName']}',
+                              reportId: report['reportId'],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
               );
             },
           );
